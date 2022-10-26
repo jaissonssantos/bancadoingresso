@@ -7,11 +7,19 @@ const styles = StyleSheet.create({
   container: {
     marginVertical: verticalScale(10),
   },
+  content: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   label: {
     marginBottom: verticalScale(6),
   },
   containerInput: {
     position: 'relative',
+    borderRadius: scale(50),
+    borderWidth: 1,
+    borderColor: Colors.whiteDarkLight,
   },
   search: {
     position: 'absolute',
@@ -20,14 +28,12 @@ const styles = StyleSheet.create({
   },
   input: {
     height: verticalScale(45),
-    borderRadius: scale(50),
     fontFamily: Fonts.PoppinsMedium,
     color: Colors.text,
     fontSize: scale(12),
     paddingHorizontal: scale(40),
-    borderWidth: 1,
-    borderColor: Colors.whiteDarkLight,
   },
+
   inputError: {
     borderColor: Colors.errorRed,
   },
@@ -45,9 +51,20 @@ const styles = StyleSheet.create({
     paddingRight: scale(5),
     paddingTop: verticalScale(5),
   },
+  searchClean: {
+    position: 'absolute',
+    top: verticalScale(18),
+    right: scale(16),
+  },
   errorText: {
     flex: 1,
     paddingRight: scale(20),
+  },
+  cancelText: {
+    fontFamily: Fonts.PoppinsMedium,
+    fontSize: scale(12),
+    color: Colors.whiteDarkLight,
+    marginLeft: scale(10),
   },
 });
 

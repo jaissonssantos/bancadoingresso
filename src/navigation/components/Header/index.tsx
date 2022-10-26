@@ -19,7 +19,7 @@ export const Header: React.FC<NativeStackHeaderProps> = ({
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
       <PressableOpacity onPress={navigation.goBack} style={styles.backButton}>
-        <ArrowLeftIcon fill={Colors.black} size={IconSizes.xxxxmedium} />
+        <ArrowLeftIcon fill={Colors.white} size={IconSizes.xxxxmedium} />
       </PressableOpacity>
       {!!title && (
         <Text size={TextSizes.xmedium} weight={TextWeights.medium}>

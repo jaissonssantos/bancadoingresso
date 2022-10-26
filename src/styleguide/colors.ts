@@ -12,6 +12,7 @@ export enum Colors {
   overlay = 'rgba(0, 0, 0, 0.3)',
   overlayMedium = 'rgba(0, 0, 0, 0.5)',
   overlayDark = 'rgba(0, 0, 0, 0.8)',
+  overlayDarkCart = 'rgba(37, 37, 37, 0.7)',
   transparent = '#FFFFFF00',
   black = '#040101',
   blackLight = '#1F1F1F',

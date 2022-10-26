@@ -80,7 +80,7 @@ export const Button: React.FC<ButtonProps> = ({
     {iconPosition === ButtonIconPosition.right && icon}
     {loading && (
       <View style={stylesByType[type].loadingContainer}>
-        <ActivityIndicator size="small" color={textColor} />
+        <ActivityIndicator size="small" color={textColor ?? Colors.white} />
       </View>
     )}
   </PressableOpacity>
