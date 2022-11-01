@@ -6,7 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios --simulator=\"iPhone 14 Pro\"",
     "start": "react-native start --reset-cache",
-    "android:build-debug-development": "yarn && cd android/ && ENVFILE=.env ./gradlew assembleDebug",
+    "android:build-release": "yarn && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output --assets-dest android/app/src/main/res/ && cd android/ && ENVFILE=.env ./gradlew assembleRelease",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
