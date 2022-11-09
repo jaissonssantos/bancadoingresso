@@ -12,6 +12,10 @@ import CartSvg from './svgs/cart.svg';
 import NoteSvg from './svgs/note.svg';
 import GearSvg from './svgs/gear.svg';
 import SearchSvg from './svgs/search.svg';
+import SubtractSvg from './svgs/subtract.svg';
+import PlusSvg from './svgs/plus.svg';
+import TrashSvg from './svgs/trash.svg';
+import EmptyCartSvg from './svgs/empty-cart.svg';
 import { svgIconSizeHoc } from './svgs/svgIconSizeHoc';
 
 const ArrowLeftIcon = svgIconSizeHoc(ArrowLeftSvg);
@@ -27,6 +31,10 @@ const CartIcon = svgIconSizeHoc(CartSvg);
 const NoteIcon = svgIconSizeHoc(NoteSvg);
 const GearIcon = svgIconSizeHoc(GearSvg);
 const SearchIcon = svgIconSizeHoc(SearchSvg);
+const SubtractIcon = svgIconSizeHoc(SubtractSvg);
+const PlusIcon = svgIconSizeHoc(PlusSvg);
+const TrashIcon = svgIconSizeHoc(TrashSvg);
+const EmptyCartIcon = svgIconSizeHoc(EmptyCartSvg);
 
 export {
   ArrowLeftIcon,
@@ -42,6 +50,10 @@ export {
   NoteIcon,
   GearIcon,
   SearchIcon,
+  SubtractIcon,
+  PlusIcon,
+  TrashIcon,
+  EmptyCartIcon,
   svgIconSizeHoc,
   IconSizes,
 };

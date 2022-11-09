@@ -40,14 +40,14 @@ export const MainTab: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
       <MainTabItem
         label="Produtos"
         Icon={ProductIcon}
-        active={isRouteActive(ROUTES.MainTab.ScheduleHome)}
-        onPress={onNavigateToRoute(ROUTES.MainTab.ScheduleHome)}
+        active={isRouteActive(ROUTES.MainTab.ProductsHome)}
+        onPress={onNavigateToRoute(ROUTES.MainTab.ProductsHome)}
       />
       <MainTabItem
         label="Carrinho"
         Icon={CartIcon}
-        active={isRouteActive(ROUTES.MainTab.ScheduleHome)}
-        onPress={onNavigateToRoute(ROUTES.MainTab.ScheduleHome)}
+        active={isRouteActive(ROUTES.MainTab.Cart)}
+        onPress={onNavigateToRoute(ROUTES.MainTab.Cart)}
       />
       <MainTabItem
         label="Relatórios"

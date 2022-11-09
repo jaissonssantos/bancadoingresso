@@ -1,6 +1,7 @@
 import { scale } from 'src/styleguide/scaling';
 
 export enum IconSizes {
+  nano = 'nano',
   xsmall = 'xsmall',
   small = 'small',
   xxxxmedium = 'xxxxmedium',
@@ -12,6 +13,7 @@ export enum IconSizes {
 }
 
 export const iconSizesValues: { [key in IconSizes]: number } = {
+  [IconSizes.nano]: scale(12),
   [IconSizes.xsmall]: scale(15),
   [IconSizes.small]: scale(22),
   [IconSizes.xxxxmedium]: scale(24),

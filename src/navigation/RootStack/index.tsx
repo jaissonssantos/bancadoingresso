@@ -42,7 +42,7 @@ export const RootStack: React.FC = () => {
       screenOptions={{
         header: (props): ReactElement => <Header {...props} />,
         statusBarTranslucent: true,
-        statusBarStyle: 'dark',
+        statusBarStyle: 'light',
         statusBarColor: Colors.transparent,
       }}>
       {accessToken ? (
