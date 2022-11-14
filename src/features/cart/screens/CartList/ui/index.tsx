@@ -7,15 +7,16 @@ import { CartItem } from 'src/components/CartItem';
 import { Button } from 'src/components/Button';
 import type { IProduct } from 'src/model/productDTO';
 import type { ICartState } from 'src/redux/cartSlice';
-import { formatCurrency } from 'src/util/currency';
-import { styles } from './styles';
+import { toString } from 'src/util/currency';
 import { PressableOpacity } from 'src/components/PressableOpacity';
+import { styles } from './styles';
 
 interface CartListUIProps {
   cart: ICartState;
   onAddProduct: (product: IProduct) => void;
   onSubtractProduct: (product: IProduct) => void;
   onRemoveAllProduct: () => void;
+  onPaymentTypeChoice: () => void;
 }
 
 export const CartListUI: React.FC<CartListUIProps> = ({
@@ -23,6 +24,7 @@ export const CartListUI: React.FC<CartListUIProps> = ({
   onAddProduct,
   onSubtractProduct,
   onRemoveAllProduct,
+  onPaymentTypeChoice,
 }) => {
   const renderContent = (): ReactElement => (
     <React.Fragment>
@@ -68,12 +70,12 @@ export const CartListUI: React.FC<CartListUIProps> = ({
           weight={TextWeights.medium}
           align={TextAligns.center}
           style={styles.spacingTop}>
-          {formatCurrency(cart.totalAmount)}
+          {toString(cart.totalAmount)}
         </Text>
       </View>
 
       <View style={styles.containerButton}>
-        <Button title="Fechar pedido" onPress={(): void => {}} />
+        <Button title="Fechar pedido" onPress={onPaymentTypeChoice} />
       </View>
     </React.Fragment>
   );

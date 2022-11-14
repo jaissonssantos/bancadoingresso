@@ -3,7 +3,6 @@ import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { ReactElement } from 'react';
 import { ScheduleHomeScreen } from 'src/features/schedule';
-import { ServicesHomeScreen } from 'src/features/services';
 import { MainTab } from '../components/MainTab';
 import { ROUTES } from '../constants/routes';
 import { EventStack } from '../EventStack';

@@ -6,7 +6,7 @@ import { SubtractIcon, PlusIcon, TrashIcon, IconSizes } from 'src/assets/icons';
 import { Text, TextSizes, TextWeights } from 'src/components/Text';
 import { PressableOpacity } from 'src/components/PressableOpacity';
 import { Colors } from 'src/styleguide/colors';
-import { formatCurrency } from 'src/util/currency';
+import { toString } from 'src/util/currency';
 import type { IProduct } from 'src/model/productDTO';
 import { styles } from './styles';
 
@@ -82,7 +82,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {product.name}
         </Text>
         <Text size={TextSizes.small} weight={TextWeights.medium}>
-          {formatCurrency(product.price ?? 0)}
+          {toString(product.price ?? 0)}
         </Text>
       </View>
     </View>

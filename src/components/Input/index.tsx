@@ -51,46 +51,49 @@ export const Input = memo<InputProps>(
     value,
     onChangeText,
     ...rest
-  }) => (
-    <View style={[styles.container, containerStyle]}>
-      {!!label && (
-        <Text
-          size={TextSizes.small}
-          weight={TextWeights.regular}
-          style={[styles.label, labelStyle]}>
-          {label}
-        </Text>
-      )}
-      <View style={styles.containerInput}>
-        <TextInput
-          style={[
-            styles.input,
-            inputStyleByType[type],
-            !!error && styles.inputError,
-            style,
-          ]}
-          placeholderTextColor={Colors.placeholder}
-          maxLength={maxLength}
-          onChangeText={(text: string): void => onChangeText(name, text)}
-          value={value}
-          {...inputPropsByType[type]}
-          {...rest}
-        />
+  }) => {
+    const shouldShowError = !!error && typeof error === 'string';
 
-        {renderForward && renderForward()}
-      </View>
-      {!!(error || maxLength) && (
-        <View style={styles.rowBelowInput}>
-          {!!error && (
+    return (
+      <View style={[styles.container, containerStyle]}>
+        {!!label && (
+          <Text
+            size={TextSizes.small}
+            weight={TextWeights.regular}
+            style={[styles.label, labelStyle]}>
+            {label}
+          </Text>
+        )}
+        <View style={styles.containerInput}>
+          <TextInput
+            style={[
+              styles.input,
+              inputStyleByType[type],
+              shouldShowError && styles.inputError,
+              style,
+            ]}
+            placeholderTextColor={Colors.placeholder}
+            maxLength={maxLength}
+            onChangeText={(text: string): void => onChangeText(name, text)}
+            value={value}
+            {...inputPropsByType[type]}
+            {...rest}
+          />
+
+          {renderForward && renderForward()}
+        </View>
+
+        {shouldShowError && (
+          <View style={styles.rowBelowInput}>
             <Text
               size={TextSizes.small}
               color={Colors.errorRed}
               style={styles.errorText}>
               {error}
             </Text>
-          )}
-        </View>
-      )}
-    </View>
-  ),
+          </View>
+        )}
+      </View>
+    );
+  },
 );

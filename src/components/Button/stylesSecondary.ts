@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { Colors } from 'src/styleguide/colors';
-import { scale, verticalScale } from 'src/styleguide/scaling';
+import { scale } from 'src/styleguide/scaling';
 
 const stylesSecondary = StyleSheet.create({
   pressable: {
@@ -10,6 +10,7 @@ const stylesSecondary = StyleSheet.create({
     borderRadius: scale(6),
     backgroundColor: Colors.white,
     padding: scale(12),
+    minHeight: scale(45),
   },
   text: {
     marginHorizontal: scale(10),
@@ -18,9 +19,6 @@ const stylesSecondary = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: scale(20),
-    backgroundColor: Colors.white,
-    paddingTop: verticalScale(1),
   },
 });
 

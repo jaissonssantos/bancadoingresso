@@ -10,7 +10,7 @@ import type { ISector } from 'src/model/sectorDTO';
 import type { IEvent } from 'src/model/eventDTO';
 import type { IProduct } from 'src/model/productDTO';
 import type { ICartState } from 'src/redux/cartSlice';
-import { formatCurrency } from 'src/util/currency';
+import { toString } from 'src/util/currency';
 import { Colors } from 'src/styleguide/colors';
 import { styles } from './styles';
 
@@ -80,7 +80,7 @@ export const SectorUI: React.FC<SectorUIProps> = ({
           icon={
             <View style={styles.iconRight}>
               <Text size={TextSizes.small} weight={TextWeights.bold}>
-                {formatCurrency(cart.totalAmount)}
+                {toString(cart.totalAmount)}
               </Text>
             </View>
           }

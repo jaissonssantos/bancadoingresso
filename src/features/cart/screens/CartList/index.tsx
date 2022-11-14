@@ -12,7 +12,9 @@ import { CartListUI } from './ui';
 
 type CartListScreenProps = CartStackScreenProps<'CartTabHome.itself'>;
 
-export const CartListScreen: React.FC<CartListScreenProps> = () => {
+export const CartListScreen: React.FC<CartListScreenProps> = ({
+  navigation,
+}) => {
   const cart = useSelector(useCart);
   const dispatch = useDispatch();
 
@@ -28,12 +30,17 @@ export const CartListScreen: React.FC<CartListScreenProps> = () => {
     dispatch(removeAllItemFromCart());
   };
 
+  const handleOnPaymentTypeChoice = (): void => {
+    navigation.navigate('CartTabHome.PaymentCartInput');
+  };
+
   return (
     <CartListUI
       cart={cart}
       onAddProduct={handleOnAddProduct}
       onSubtractProduct={handleOnSubtractProduct}
       onRemoveAllProduct={handleOnRemoveAllProduct}
+      onPaymentTypeChoice={handleOnPaymentTypeChoice}
     />
   );
 };

@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blackLight,
   },
   inputError: {
+    borderWidth: scale(1),
     borderColor: Colors.errorRed,
   },
   textarea: {

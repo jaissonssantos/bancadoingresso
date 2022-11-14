@@ -1,0 +1,3 @@
+const MAX_AMOUNT = 99999999999;
+
+export { MAX_AMOUNT };

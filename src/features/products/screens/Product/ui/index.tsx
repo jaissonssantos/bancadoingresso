@@ -9,7 +9,7 @@ import { Colors } from 'src/styleguide/colors';
 import { ProductCard } from 'src/features/products/components/ProductCard';
 import type { IProduct } from 'src/model/productDTO';
 import { Button, ButtonIconPosition } from 'src/components/Button';
-import { formatCurrency } from 'src/util/currency';
+import { toString } from 'src/util/currency';
 import type { ICartState } from 'src/redux/cartSlice';
 import { styles } from './styles';
 
@@ -77,7 +77,7 @@ export const ProductUI: React.FC<ProductUIProps> = ({
           icon={
             <View style={styles.iconRight}>
               <Text size={TextSizes.small} weight={TextWeights.bold}>
-                {formatCurrency(cart.totalAmount)}
+                {toString(cart.totalAmount)}
               </Text>
             </View>
           }

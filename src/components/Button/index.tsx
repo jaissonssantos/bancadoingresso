@@ -69,14 +69,16 @@ export const Button: React.FC<ButtonProps> = ({
     disabled={disabled || loading}
     style={[stylesByType[type].pressable, style]}>
     {iconPosition === ButtonIconPosition.left && icon}
-    <Text
-      size={TextSizes.small}
-      align={textAlign ?? TextAligns.center}
-      weight={TextWeights.bold}
-      color={textColor ?? textColorByType[type]}
-      style={[stylesByType[type].text, titleStyle]}>
-      {title}
-    </Text>
+    {!loading && (
+      <Text
+        size={TextSizes.small}
+        align={textAlign ?? TextAligns.center}
+        weight={TextWeights.bold}
+        color={textColor ?? textColorByType[type]}
+        style={[stylesByType[type].text, titleStyle]}>
+        {title}
+      </Text>
+    )}
     {iconPosition === ButtonIconPosition.right && icon}
     {loading && (
       <View style={stylesByType[type].loadingContainer}>

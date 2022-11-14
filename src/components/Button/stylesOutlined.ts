@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { Colors } from 'src/styleguide/colors';
-import { scale, verticalScale } from 'src/styleguide/scaling';
+import { scale } from 'src/styleguide/scaling';
 
 const stylesOutlined = StyleSheet.create({
   pressable: {
@@ -11,17 +11,15 @@ const stylesOutlined = StyleSheet.create({
     borderColor: Colors.primary,
     borderWidth: scale(1),
     padding: scale(8),
+    minHeight: scale(45),
   },
   text: {
     marginHorizontal: scale(10),
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
-    margin: scale(1),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: scale(20),
-    paddingTop: verticalScale(1),
   },
 });
 

@@ -16,7 +16,13 @@ export const ROUTES = {
   },
   CartTabHome: {
     itself: 'CartTabHome.itself',
-    Sector: 'CartTabHome.Sector',
+    PaymentCartInput: 'CartTabHome.PaymentCartInput',
+    PaymentTypeChoice: 'CartTabHome.PaymentTypeChoice',
+    PaymentByCash: 'CartTabHome.PaymentByCash',
+    PaymentByPix: 'CartTabHome.PaymentByPix',
+    PaymentByDebitCard: 'CartTabHome.PaymentByDebitCard',
+    PaymentChoiceByInstallment: 'CartTabHome.PaymentChoiceByInstallment',
+    PaymentByCreditCard: 'CartTabHome.PaymentByCreditCard',
   },
   ProductsTabHome: {
     itself: 'ProductsTabHome.itself',

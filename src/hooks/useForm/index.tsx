@@ -10,7 +10,7 @@ export type Validator<T = FormData> = (
   formData: T,
 ) => ValidatorResult;
 
-type Formatter = (value: Value) => string;
+export type Formatter = (value: Value) => string;
 type FormErrors<T> = {
   [key in keyof T]?: string[] | undefined;
 };
