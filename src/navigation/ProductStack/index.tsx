@@ -14,10 +14,10 @@ import type { IEvent } from 'src/features/products/model/eventDTO';
 import type { ISector } from 'src/features/products/model/sectorDTO';
 import type { IGroup } from 'src/features/products/model/groupDTO';
 import type { ISubGroup } from 'src/features/products/model/subgroupDTO';
+import type { CartStackScreenProps } from '../CartStack';
 import { Colors } from 'src/styleguide/colors';
 import { Header } from '../components/Header';
 import { ROUTES } from '../constants/routes';
-import type { MainTabScreenProps } from '../MainTabNavigator';
 
 const { ProductsTabHome: PRODUCTS_TAB_HOME_ROUTES } = ROUTES;
 
@@ -35,7 +35,7 @@ export type ProductsTabHomeParamList = {
 export type ProductsStackScreenProps<T extends keyof ProductsTabHomeParamList> =
   CompositeScreenProps<
     NativeStackScreenProps<ProductsTabHomeParamList, T>,
-    MainTabScreenProps<'MainTab.Home'>
+    CartStackScreenProps<'CartTabHome.itself'>
   >;
 
 const Stack = createNativeStackNavigator<ProductsTabHomeParamList>();

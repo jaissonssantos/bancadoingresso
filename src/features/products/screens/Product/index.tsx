@@ -22,6 +22,7 @@ export const ProductScreen: React.FC<ProductScreenProps> = ({
   const [subGroupData, setSubGroupData] = useState<ISubGroup>(
     subGroupDataFromNavigation,
   );
+  const [visible, setVisible] = useState(false);
 
   const cart = useSelector(useCart);
   const dispatch = useDispatch();
@@ -30,7 +31,7 @@ export const ProductScreen: React.FC<ProductScreenProps> = ({
     initialData: { query: '' },
   });
 
-  const handleOnGoToCart = (): void => navigation.navigate('MainTab.Cart');
+  const handleOnGoToCart = (): void => setVisible(!visible);
 
   const handleOnAddProduct = (product: IProduct): void => {
     dispatch(addItemToCart(product));
@@ -38,6 +39,12 @@ export const ProductScreen: React.FC<ProductScreenProps> = ({
 
   const handleOnSubtractProduct = (product: IProduct): void => {
     dispatch(removeItemFromCart(product));
+  };
+
+  const handleOnDismiss = (value: boolean): void => setVisible(value);
+
+  const handleOnPaymentTypeChoice = (): void => {
+    navigation.navigate('CartTabHome.PaymentCartInput');
   };
 
   useEffect(() => {
@@ -75,12 +82,15 @@ export const ProductScreen: React.FC<ProductScreenProps> = ({
   return (
     <ProductUI
       cart={cart}
+      visible={visible}
       subGroupData={subGroupDataFromNavigation}
       formData={formData}
       onChangeInput={onChangeInput}
       onAddProduct={handleOnAddProduct}
       onSubtractProduct={handleOnSubtractProduct}
       onGoToCart={handleOnGoToCart}
+      onDismiss={handleOnDismiss}
+      onPaymentTypeChoice={handleOnPaymentTypeChoice}
     />
   );
 };

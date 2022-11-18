@@ -5,6 +5,7 @@ import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
 import { InputSearch } from 'src/components/InputSearch';
 import type { UseFormReturn } from 'src/hooks/useForm';
 import type { ISubGroup } from 'src/features/products/model/subgroupDTO';
+import { BottomSheetCartList } from 'src/components/BottomSheetCartList';
 import { Colors } from 'src/styleguide/colors';
 import { ProductCard } from 'src/features/products/components/ProductCard';
 import type { IProduct } from 'src/model/productDTO';
@@ -20,20 +21,26 @@ export type SearchFormData = {
 interface ProductUIProps
   extends Pick<UseFormReturn<SearchFormData>, 'onChangeInput' | 'formData'> {
   cart: ICartState;
+  visible: boolean;
   subGroupData: ISubGroup;
   onAddProduct: (product: IProduct) => void;
   onSubtractProduct: (product: IProduct) => void;
   onGoToCart: () => void;
+  onDismiss: (value: boolean) => void;
+  onPaymentTypeChoice: () => void;
 }
 
 export const ProductUI: React.FC<ProductUIProps> = ({
   cart,
+  visible,
   subGroupData,
   formData,
   onChangeInput,
   onAddProduct,
   onSubtractProduct,
   onGoToCart,
+  onDismiss,
+  onPaymentTypeChoice,
 }) => (
   <View style={styles.root}>
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -85,5 +92,11 @@ export const ProductUI: React.FC<ProductUIProps> = ({
         />
       </Animated.View>
     )}
+
+    <BottomSheetCartList
+      visible={visible}
+      onDismiss={onDismiss}
+      onContinue={onPaymentTypeChoice}
+    />
   </View>
 );

@@ -21,6 +21,7 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
   const [sectorData, setSectorData] = useState<ISectorData>(
     sectorDataFromNavigation,
   );
+  const [visible, setVisible] = useState(false);
 
   const cart = useSelector(useCart);
   const dispatch = useDispatch();
@@ -37,10 +38,13 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
     dispatch(removeItemFromCart(product));
   };
 
-  const handleOnGoToCart = (): void =>
-    navigation.navigate('MainTab.Itself', {
-      screen: 'MainTab.Cart',
-    });
+  const handleOnGoToCart = (): void => setVisible(!visible);
+
+  const handleOnDismiss = (value: boolean): void => setVisible(value);
+
+  const handleOnPaymentTypeChoice = (): void => {
+    navigation.navigate('CartTabHome.PaymentCartInput');
+  };
 
   useEffect(() => {
     navigation.setOptions({ title: route.params.name });
@@ -74,12 +78,15 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
   return (
     <SectorUI
       cart={cart}
+      visible={visible}
       sectorData={sectorData}
       formData={formData}
       onChangeInput={onChangeInput}
       onAddProduct={handleOnAddProduct}
       onSubtractProduct={handleOnSubtractProduct}
       onGoToCart={handleOnGoToCart}
+      onDismiss={handleOnDismiss}
+      onPaymentTypeChoice={handleOnPaymentTypeChoice}
     />
   );
 };

@@ -5,6 +5,7 @@ import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
 import { InputSearch } from 'src/components/InputSearch';
 import { CartItem } from 'src/components/CartItem';
 import { Button, ButtonIconPosition } from 'src/components/Button';
+import { BottomSheetCartList } from 'src/components/BottomSheetCartList';
 import type { UseFormReturn } from 'src/hooks/useForm';
 import type { ISector } from 'src/model/sectorDTO';
 import type { IEvent } from 'src/model/eventDTO';
@@ -25,20 +26,26 @@ export interface ISectorData extends Partial<ISector> {
 interface SectorUIProps
   extends Pick<UseFormReturn<SearchFormData>, 'onChangeInput' | 'formData'> {
   cart: ICartState;
+  visible: boolean;
   sectorData: ISectorData;
   onAddProduct: (product: IProduct) => void;
   onSubtractProduct: (product: IProduct) => void;
   onGoToCart: () => void;
+  onDismiss: (value: boolean) => void;
+  onPaymentTypeChoice: () => void;
 }
 
 export const SectorUI: React.FC<SectorUIProps> = ({
   cart,
+  visible,
   sectorData,
   formData,
   onChangeInput,
   onAddProduct,
   onSubtractProduct,
   onGoToCart,
+  onDismiss,
+  onPaymentTypeChoice,
 }) => (
   <View style={styles.root}>
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -88,5 +95,11 @@ export const SectorUI: React.FC<SectorUIProps> = ({
         />
       </Animated.View>
     )}
+
+    <BottomSheetCartList
+      visible={visible}
+      onDismiss={onDismiss}
+      onContinue={onPaymentTypeChoice}
+    />
   </View>
 );
