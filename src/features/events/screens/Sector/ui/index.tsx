@@ -7,8 +7,7 @@ import { CartItem } from 'src/components/CartItem';
 import { Button, ButtonIconPosition } from 'src/components/Button';
 import { BottomSheetCartList } from 'src/components/BottomSheetCartList';
 import type { UseFormReturn } from 'src/hooks/useForm';
-import type { ISector } from 'src/model/sectorDTO';
-import type { IEvent } from 'src/model/eventDTO';
+import type { IEvent, ISections } from 'src/model/eventDTO';
 import type { IProduct } from 'src/model/productDTO';
 import type { ICartState } from 'src/redux/cartSlice';
 import { toString } from 'src/util/currency';
@@ -19,7 +18,7 @@ export type SearchFormData = {
   query: string;
 };
 
-export interface ISectorData extends Partial<ISector> {
+export interface ISectorData extends ISections {
   event?: IEvent;
 }
 
@@ -65,9 +64,9 @@ export const SectorUI: React.FC<SectorUIProps> = ({
         {sectorData.event?.name}
       </Text>
 
-      {sectorData.items?.map(ticket => (
+      {sectorData.tickets?.map(ticket => (
         <CartItem
-          key={ticket.id}
+          key={`${ticket.id}-${ticket.name}-${ticket.isHalfPrice}`}
           product={ticket}
           onAdd={onAddProduct}
           onSubtract={onSubtractProduct}

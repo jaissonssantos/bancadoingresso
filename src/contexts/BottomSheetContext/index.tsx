@@ -1,5 +1,5 @@
 import { createContext, ReactNode } from 'react';
-import type { MessageBottomSheetContenProps } from './MessageBottomSheetContent';
+import type { MessageBottomSheetContentProps } from './MessageBottomSheetContent';
 
 export interface BottomSheetShowOptions {
   content: ReactNode;
@@ -7,7 +7,7 @@ export interface BottomSheetShowOptions {
 
 export interface BottomSheetContextValue {
   show: (options: BottomSheetShowOptions) => void;
-  showMessage: (options: Partial<MessageBottomSheetContenProps>) => void;
+  showMessage: (options: Partial<MessageBottomSheetContentProps>) => void;
   hide: () => void;
 }
 

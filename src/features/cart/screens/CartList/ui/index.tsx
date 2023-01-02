@@ -31,7 +31,7 @@ export const CartListUI: React.FC<CartListUIProps> = ({
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {cart.items?.map(ticket => (
           <CartItem
-            key={ticket.id}
+            key={`${ticket.id}-${ticket.name}-${ticket.isHalfPrice}`}
             product={ticket}
             isAvailableClearCart
             onAdd={onAddProduct}

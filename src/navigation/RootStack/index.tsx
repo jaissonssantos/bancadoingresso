@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
 });
 
 export const RootStack: React.FC = () => {
-  const { accessToken } = useAuth();
+  const { token } = useAuth();
 
   return (
     <GestureHandlerRootView style={styles.flex1}>
@@ -56,7 +56,7 @@ export const RootStack: React.FC = () => {
             statusBarStyle: 'light',
             statusBarColor: Colors.transparent,
           }}>
-          {accessToken ? (
+          {token ? (
             <>
               <Stack.Screen
                 name={MAIN_TAB_ROUTES.Itself}

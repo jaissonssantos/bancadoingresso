@@ -23,9 +23,10 @@ export const CartItem: React.FC<CartItemProps> = ({
   isAvailableClearCart = false,
   style,
 }) => {
-  const finalStyleButtonSubtract = [
-    product.quantity === 0 ? { opacity: 0.5 } : {},
-  ];
+  const quantity = product.quantity;
+  const maxLimit = product.count ?? 0;
+
+  const finalStyleButtonSubtract = [quantity === 0 ? { opacity: 0.5 } : {}];
 
   return (
     <View style={[styles.container, style]}>
@@ -35,29 +36,31 @@ export const CartItem: React.FC<CartItemProps> = ({
             {product.name}
           </Text>
           <Text size={TextSizes.small} weight={TextWeights.medium}>
-            {toString(product.price ?? 0)}
+            {toString(product.value ?? 0)}
           </Text>
         </View>
 
         <View style={[styles.row, styles.actions]}>
-          {isAvailableClearCart && product.quantity === 1 ? (
+          {isAvailableClearCart && quantity === 1 ? (
             <PressableOpacity onPress={(): void => onSubtract(product)}>
               <TrashIcon size={IconSizes.small} fill={Colors.primaryLight} />
             </PressableOpacity>
           ) : (
             <PressableOpacity
               onPress={(): void => onSubtract(product)}
-              disabled={product.quantity === 0}
+              disabled={quantity === 0}
               style={finalStyleButtonSubtract}>
               <SubtractIcon size={IconSizes.small} stroke={Colors.white} />
             </PressableOpacity>
           )}
 
           <Text size={TextSizes.medium} style={styles.textQuantity}>
-            {product.quantity}
+            {product.quantity ?? 0}
           </Text>
 
-          <PressableOpacity onPress={(): void => onAdd(product)}>
+          <PressableOpacity
+            onPress={(): void => onAdd(product)}
+            disabled={quantity >= maxLimit}>
             <PlusIcon size={IconSizes.small} stroke={Colors.white} />
           </PressableOpacity>
         </View>

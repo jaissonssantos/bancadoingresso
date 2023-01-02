@@ -19,7 +19,7 @@ export const IntroLoadingScreen: React.FC<IntroLoadingScreenProps> = ({
     // Little delay to avoid transitions bugs
     await waitFor(100);
 
-    if (persistedState?.accessToken) {
+    if (persistedState?.token) {
       // It'll navigate automatically
       updateAuthState(persistedState);
       return;

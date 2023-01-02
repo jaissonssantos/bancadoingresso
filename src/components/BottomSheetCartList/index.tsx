@@ -101,7 +101,7 @@ export const BottomSheetCartList: React.FC<BottomSheetCartListProps> = ({
     <ScrollView contentContainerStyle={styles.scrollInner}>
       {cart.items?.map(ticket => (
         <CartItem
-          key={ticket.id}
+          key={`${ticket.id}-${ticket.name}-${ticket.isHalfPrice}`}
           product={ticket}
           isAvailableClearCart
           onAdd={handleOnAddProduct}

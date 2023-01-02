@@ -1,16 +1,23 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import type { EventStackScreenProps } from 'src/navigation/EventStack';
-import type { IEvent } from 'src/model/eventDTO';
-import type { ISector } from 'src/model/sectorDTO';
+import { useAuth } from 'src/contexts/AuthContext/useAuth';
+import type { IEvent, ISections } from 'src/model/eventDTO';
 import { useForm } from 'src/hooks/useForm';
-import { useEvents } from 'src/redux/eventsSlice';
+import { fetchEvents, useEvents, AppDispatch } from 'src/redux/eventsSlice';
 import { HomeUI, SearchFormData } from './ui';
 
 type HomeScreenProps = EventStackScreenProps<'EventsTabHome.itself'>;
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const events = useSelector(useEvents);
+  const [eventsFiltered, setEventsFiltered] = useState<IEvent[]>([]);
+
+  const { events } = useSelector(useEvents);
+  const dispatch: AppDispatch = useDispatch();
+
+  const { token } = useAuth();
+
+  // clearAuthState();
 
   const { formData, onChangeInput } = useForm<SearchFormData>({
     initialData: { query: '' },
@@ -20,7 +27,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     itemSelected,
     itemExtra,
   }: {
-    itemSelected: ISector;
+    itemSelected: ISections;
     itemExtra?: IEvent;
   }): void => {
     navigation.push('EventsTabHome.Sector', {
@@ -29,9 +36,33 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     });
   };
 
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchEvents(token));
+    }
+  }, [token]);
+
+  useEffect(() => {
+    setEventsFiltered(events);
+  }, [events]);
+
+  useEffect(() => {
+    if (formData.query.length >= 2) {
+      const filtered = events.filter(event =>
+        event.name
+          .toLocaleLowerCase()
+          .includes(formData.query.toLocaleLowerCase()),
+      );
+
+      setEventsFiltered(filtered);
+    } else {
+      setEventsFiltered(events);
+    }
+  }, [formData.query]);
+
   return (
     <HomeUI
-      events={events}
+      events={eventsFiltered}
       formData={formData}
       onChangeInput={onChangeInput}
       onPressItem={handleOnPressItem}

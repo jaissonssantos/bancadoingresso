@@ -7,12 +7,11 @@ import Animated, {
 } from 'react-native-reanimated';
 import { PressableOpacity } from 'src/components/PressableOpacity';
 import { Text, TextAligns, TextSizes } from 'src/components/Text';
-import type { IEvent } from 'src/model/eventDTO';
-import type { ISector } from 'src/model/sectorDTO';
+import type { IEvent, ISections } from 'src/model/eventDTO';
 import { Dot } from './Dot';
 import { styles, cardWidth } from './styles';
 
-export interface ICarousel extends Partial<ISector> {
+export interface ICarousel extends Partial<ISections> {
   event?: IEvent;
 }
 
@@ -27,7 +26,7 @@ interface CarouselCardProps {
     itemSelected,
     itemExtra,
   }: {
-    itemSelected: ISector;
+    itemSelected: ISections;
     itemExtra?: IEvent;
   }) => void;
 }
@@ -85,20 +84,20 @@ export const CarouselCard: React.FC<CarouselCardProps> = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         decelerationRate="fast"
-        keyExtractor={(item): string => item?.name?.toString() ?? ''}
+        keyExtractor={(item): string => item?.section?.name?.toString() ?? ''}
         onScroll={scrollHandler}
         renderItem={({ item }): ReactElement => (
           <PressableOpacity
             onPress={(): void =>
               onPress({
-                itemSelected: item as ISector,
+                itemSelected: item as ISections,
                 itemExtra: extraData,
               })
             }
-            key={item.name}
+            key={item.section?.name}
             style={styles.item}>
             <Text size={TextSizes.xxsmall} align={TextAligns.center}>
-              {item.name}
+              {item.section?.name}
             </Text>
           </PressableOpacity>
         )}

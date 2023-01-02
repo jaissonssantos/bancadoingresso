@@ -26,16 +26,16 @@ export const formatValueToCurrency = (
 ): IFormatValueToCurrency => {
   const prefix = Number(value) < 0 ? '-' : '';
 
-  const valueNumeric = value ? Number(removeSpecialCharacters(value)) : 0;
+  // const valueNumeric = value ? Number(removeSpecialCharacters(value)) : 0;
 
-  const valueNumericInCents = valueNumeric / 100;
+  // const valueNumericInCents = valueNumeric / 100;
 
   const formatter = new Intl.NumberFormat('pt-BR', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
-  const finalCurrencyValue = formatter.format(valueNumericInCents);
+  const finalCurrencyValue = formatter.format(Number(value));
 
   return {
     masked: `R$ ${prefix}${finalCurrencyValue}`,

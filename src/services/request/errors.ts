@@ -1,19 +1,20 @@
-import axios from 'axios';
-
-interface ApiErrorData {
-  error?: string;
-  message?: string[];
-}
+import { ApiError } from './ApiError';
 
 const isNetworkError = (error: unknown): boolean =>
-  error instanceof Error && error.message === 'Network Error';
-
-const getApiErrorData = (error: unknown): ApiErrorData | null =>
-  axios.isAxiosError(error) ? error.response?.data : null;
+  error instanceof Error && error.message === 'Network request failed';
 
 const getApiErrorMsg = (error: unknown): string => {
-  const data = getApiErrorData(error);
-  return data?.error || data?.message?.[0] || '';
+  if (!(error instanceof ApiError)) {
+    return '';
+  }
+
+  return (
+    error.data.error ||
+    (typeof error.data.message === 'string'
+      ? error.data.message
+      : error.data.message?.[0]) ||
+    ''
+  );
 };
 
 export const getErrorMessage = (error: unknown): string => {

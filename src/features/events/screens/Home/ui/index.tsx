@@ -8,8 +8,7 @@ import { Text, TextSizes, TextWeights } from 'src/components/Text';
 import { InputSearch } from 'src/components/InputSearch';
 import { CarouselCard } from 'src/components/CarouselCard';
 import type { UseFormReturn } from 'src/hooks/useForm';
-import type { ISector } from 'src/model/sectorDTO';
-import type { IEvent } from 'src/model/eventDTO';
+import type { IEvent, ISections } from 'src/model/eventDTO';
 import { Colors } from 'src/styleguide/colors';
 import { styles } from './styles';
 
@@ -24,7 +23,7 @@ interface HomeUIProps
     itemSelected,
     itemExtra,
   }: {
-    itemSelected: ISector;
+    itemSelected: ISections;
     itemExtra?: IEvent;
   }) => void;
 }
@@ -81,28 +80,26 @@ export const HomeUI: React.FC<HomeUIProps> = ({
           Você possui {events.length ?? 0} eventos disponíveis
         </Text>
 
-        {events?.map(event => (
-          <Accordion
-            key={event.id}
-            title={event.name}
-            image={{ uri: event.image }}
-            isContentNoPadding
-            style={styles.spacingBottomXLarge}>
-            {event.section.map(section => (
+        {events.length > 0 &&
+          events?.map(event => (
+            <Accordion
+              key={event.id}
+              title={event.name}
+              image={{ uri: event.imagePosBase64 }}
+              isContentNoPadding
+              style={styles.spacingBottomXLarge}>
               <CarouselCard
-                key={section.date}
-                title={`${dayjs(section.date).format('DD/MM')} - ${dayjs(
-                  section.date,
+                title={`${dayjs(event.startDate).format('DD/MM')} - ${dayjs(
+                  event.startDate,
                 ).format('dddd')}`}
                 titleStyle={styles.spacingCarouselTitle}
                 containerStyle={styles.containerCarousel}
                 onPress={onPressItem}
-                data={section.items}
+                data={event.sections}
                 extraData={event}
               />
-            ))}
-          </Accordion>
-        ))}
+            </Accordion>
+          ))}
       </ScrollView>
     </SafeAreaView>
   </FadeBackground>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import base64 from 'react-native-base64';
 import { useAuth } from 'src/contexts/AuthContext/useAuth';
 import { useBottomSheet } from 'src/contexts/BottomSheetContext/useBottomSheet';
 import type { RootStackScreenProps } from 'src/navigation/RootStack';
@@ -6,6 +7,7 @@ import { getErrorMessage } from 'src/services/request/errors';
 import { useForm } from 'src/hooks/useForm';
 import * as validators from 'src/util/validators';
 import * as cpf from 'src/util/cpf';
+import { requestLogin } from 'src/features/auth/services';
 import { LoginUI, LoginUIStates, LoginFormData } from './ui';
 
 type LoginScreenProps = RootStackScreenProps<'Auth.Login'>;
@@ -38,13 +40,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
         return;
       }
 
-      await Promise.resolve();
+      const authHeader = `Basic ${base64.encode(
+        `${formData.document}:${formData.password}`,
+      )}`;
+
+      const response = await requestLogin({
+        grant_type: 'client_credentials',
+        auth_header: authHeader,
+      });
 
       // It'll navigate automatically
-      updateAuthState({ accessToken: '92834o23j4lk2jkjh2kjh34k2jh347823jk' });
+      updateAuthState(response);
     } catch (error) {
       bottomSheet.showMessage({
-        title: 'Erro',
+        title: 'Autenticação',
         message: getErrorMessage(error),
       });
     } finally {

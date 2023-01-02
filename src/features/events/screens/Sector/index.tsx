@@ -46,34 +46,61 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
     navigation.navigate('CartTabHome.PaymentCartInput');
   };
 
+  const handleFetchCart = (): void => {
+    if (cart.items.length > 0) {
+      const newSector = sectorDataFromNavigation.tickets.map(ticket => {
+        const cartItem = cart.items.find(
+          product =>
+            product.id === ticket.id &&
+            product.name === ticket.name &&
+            product.isHalfPrice === ticket.isHalfPrice,
+        );
+
+        return {
+          ...ticket,
+          quantity: cartItem?.quantity ?? 0,
+        };
+      });
+
+      setSectorData({ ...sectorData, tickets: newSector });
+    } else {
+      const newSector = sectorDataFromNavigation.tickets.map(ticket => ({
+        ...ticket,
+        quantity: 0,
+        totalPrice: 0,
+        isHalfPrice: ticket.isHalfPrice,
+        count: ticket.count,
+        value: ticket.value,
+        price: ticket.value,
+      }));
+
+      setSectorData({ ...sectorDataFromNavigation, tickets: newSector });
+    }
+  };
+
   useEffect(() => {
-    navigation.setOptions({ title: route.params.name });
+    navigation.setOptions({ title: route.params.section.name });
   }, [navigation]);
 
   useFocusEffect(
     useCallback(() => {
-      if (cart.items.length > 0) {
-        const newSector = sectorDataFromNavigation.items.map(item => {
-          const newItem = item;
-
-          const cartItem = cart.items.find(product => product.id === item.id);
-
-          newItem.quantity = cartItem?.quantity || 0;
-          return newItem;
-        });
-
-        setSectorData({ ...sectorData, items: newSector });
-      } else {
-        const newSector = sectorDataFromNavigation.items.map(item => {
-          const newItem = item;
-
-          newItem.quantity = 0;
-          return newItem;
-        });
-        setSectorData({ ...sectorDataFromNavigation, items: newSector });
-      }
+      handleFetchCart();
     }, [cart]),
   );
+
+  useEffect(() => {
+    if (formData.query.length >= 2) {
+      const filtered = sectorData.tickets.filter(ticket =>
+        ticket.name
+          .toLocaleLowerCase()
+          .includes(formData.query.toLocaleLowerCase()),
+      );
+
+      setSectorData({ ...sectorData, tickets: filtered });
+    } else {
+      handleFetchCart();
+    }
+  }, [formData.query]);
 
   return (
     <SectorUI

@@ -1,14 +1,55 @@
-import type { ISector } from './sectorDTO';
+// import type { ISector } from './sectorDTO';
+
+export interface IFees {
+  id: string;
+  allowCreditCardPayment: boolean;
+  debit: number | null;
+  credit: number | null;
+  bankSlip: number;
+  pix: number;
+  installments: number;
+  administrateTax: number;
+  fee: number;
+}
+
+export interface IPayment {
+  installmentLimit: number;
+  allowFractionalPayment: boolean;
+  allowPaymentBankSlip: boolean;
+  allowPaymentPIX: boolean;
+  allowContactlessPayment: boolean;
+  fees: IFees;
+}
+
+export interface ITickets {
+  id: string;
+  name: string;
+  value: number;
+  count: number;
+  isHalfPrice: boolean;
+  quantity: number;
+  totalPrice: number;
+  payment: IPayment;
+}
 
 export interface ISection {
-  date: string;
-  items: ISector[];
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface ISections {
+  section: ISection;
+  tickets: ITickets[];
 }
 
 export interface IEvent {
   id: string;
   name: string;
-  image: string;
-  date?: string;
-  section: ISection[];
+  eventPlace?: string;
+  startDate?: string;
+  endDate?: string;
+  censure?: number;
+  imagePosBase64?: string;
+  sections: ISections[];
 }

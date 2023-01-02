@@ -4,7 +4,7 @@ import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
 import { Colors } from 'src/styleguide/colors';
 import { styles } from './styles';
 
-export interface MessageBottomSheetContenProps {
+export interface MessageBottomSheetContentProps {
   title: string;
   message: string;
   buttonTitle: string;
@@ -12,13 +12,14 @@ export interface MessageBottomSheetContenProps {
 }
 
 export const MessageBottomSheetContent: React.FC<
-  MessageBottomSheetContenProps
+  MessageBottomSheetContentProps
 > = ({ title, message, buttonTitle, onPressButton }) => (
   <>
     <Text
       size={TextSizes.xmedium}
       align={TextAligns.center}
-      weight={TextWeights.bold}>
+      weight={TextWeights.bold}
+      style={styles.title}>
       {title}
     </Text>
     <Text

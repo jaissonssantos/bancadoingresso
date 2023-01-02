@@ -6,15 +6,14 @@ import {
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { CartStackScreenProps } from '../CartStack';
 import { HomeScreen, SectorScreen } from 'src/features/events';
-import type { IEvent } from 'src/model/eventDTO';
-import type { ISector } from 'src/model/sectorDTO';
+import type { IEvent, ISections } from 'src/model/eventDTO';
 import { Colors } from 'src/styleguide/colors';
 import { Header } from '../components/Header';
 import { ROUTES } from '../constants/routes';
 
 const { EventsTabHome: EVENTS_TAB_HOME_ROUTES } = ROUTES;
 
-export interface EventStackParam extends ISector {
+export interface EventStackParam extends ISections {
   event?: IEvent;
 }
 

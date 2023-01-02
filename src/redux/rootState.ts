@@ -4,6 +4,6 @@ import type { IProductsState } from 'src/redux/productsSlice';
 
 export interface RootState {
   cart: ICartState;
-  events: IEventsState[];
+  events: IEventsState;
   products: IProductsState[];
 }

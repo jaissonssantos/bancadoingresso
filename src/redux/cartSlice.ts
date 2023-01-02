@@ -20,32 +20,59 @@ const cartSlice = createSlice({
   reducers: {
     addItemToCart(state, { payload }: PayloadAction<IProduct>) {
       const newItem = payload;
-      const existingItem = state.items.find(item => item.id === newItem.id);
+
+      const existingItem = state.items.find(
+        item =>
+          item.id === newItem.id &&
+          item.name === newItem.name &&
+          item.isHalfPrice === newItem.isHalfPrice,
+      );
+
       state.totalQuantity++;
-      state.totalAmount += newItem.price;
+      state.totalAmount += newItem?.value ?? 0;
+
       if (!existingItem) {
         state.items.push({
           id: newItem.id,
-          price: newItem.price,
-          quantity: 1,
-          totalPrice: newItem.price,
           name: newItem.name,
+          count: newItem.count,
+          value: newItem.value,
+          isHalfPrice: newItem.isHalfPrice ?? false,
+          quantity: 1,
+          totalPrice: newItem.value,
+          payment: newItem.payment,
         });
       } else {
-        existingItem.quantity++;
-        existingItem.totalPrice += newItem.price;
+        const quantity = existingItem?.quantity ?? 1;
+        const totalPrice = existingItem?.totalPrice ?? 0;
+        const value = newItem?.value ?? 0;
+
+        existingItem.quantity = quantity + 1;
+        existingItem.totalPrice = totalPrice + value;
       }
     },
     removeItemFromCart(state, { payload }: PayloadAction<IProduct>) {
-      const existingItem = state.items.find(item => item.id === payload.id);
+      const existingItem = state.items.find(
+        item =>
+          item.id === payload.id &&
+          item.name === payload.name &&
+          item.isHalfPrice === payload.isHalfPrice,
+      );
+
       if (existingItem) {
         state.totalQuantity--;
-        state.totalAmount -= existingItem.price;
-        if (existingItem.quantity === 1) {
-          state.items = state.items.filter(item => item.id !== existingItem.id);
+        state.totalAmount -= payload.value;
+
+        if (payload.quantity === 1) {
+          state.items = state.items.filter(
+            item =>
+              item.id !== payload.id ||
+              item.name !== payload.name ||
+              item.isHalfPrice !== payload.isHalfPrice,
+          );
         } else {
           existingItem.quantity--;
-          existingItem.totalPrice -= existingItem.price;
+          existingItem.totalPrice -= existingItem.value;
         }
       }
     },
