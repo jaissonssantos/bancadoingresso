@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'src/hooks/useForm';
 import type { ProductsStackScreenProps } from 'src/navigation/ProductStack';
-import type { IGroup } from 'src/features/products/model/groupDTO';
+import type { IGroup } from 'src/model/groupDTO';
 import { SectorUI, SearchFormData } from './ui';
 
 type SectorScreenProps = ProductsStackScreenProps<'ProductsTabHome.Sector'>;
@@ -19,11 +19,12 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
   const handleOnGoToSubGroup = (group: IGroup): void => {
     navigation.navigate('ProductsTabHome.SubGroup', {
       ...group,
+      event: sectorDataFromNavigation.event,
     });
   };
 
   useEffect(() => {
-    navigation.setOptions({ title: route.params.name });
+    navigation.setOptions({ title: sectorDataFromNavigation.event?.name });
   }, [navigation]);
 
   return (

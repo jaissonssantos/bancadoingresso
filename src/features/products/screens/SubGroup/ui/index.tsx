@@ -3,8 +3,7 @@ import { ScrollView, View } from 'react-native';
 import { Text, TextSizes, TextWeights } from 'src/components/Text';
 import { InputSearch } from 'src/components/InputSearch';
 import type { UseFormReturn } from 'src/hooks/useForm';
-import type { IGroup } from 'src/features/products/model/groupDTO';
-import type { ISubGroup } from 'src/features/products/model/subgroupDTO';
+import type { IGroup, ISubGroups } from 'src/model/groupDTO';
 import { Colors } from 'src/styleguide/colors';
 import { SubGroupCard } from 'src/features/products/components/SubGroupCard';
 import { styles } from './styles';
@@ -16,7 +15,7 @@ export type SearchFormData = {
 interface SubGroupUIProps
   extends Pick<UseFormReturn<SearchFormData>, 'onChangeInput' | 'formData'> {
   groupData: IGroup;
-  onGoToProduct: (subgroup: ISubGroup) => void;
+  onGoToProduct: (subgroup: ISubGroups) => void;
 }
 
 export const SubGroupUI: React.FC<SubGroupUIProps> = ({
@@ -51,7 +50,7 @@ export const SubGroupUI: React.FC<SubGroupUIProps> = ({
         Subgrupo
       </Text>
 
-      <SubGroupCard data={groupData.items} onPress={onGoToProduct} />
+      <SubGroupCard data={groupData.subGroups} onPress={onGoToProduct} />
     </ScrollView>
   </View>
 );

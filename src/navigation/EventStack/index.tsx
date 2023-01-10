@@ -4,10 +4,11 @@ import {
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
 import type { CompositeScreenProps } from '@react-navigation/native';
-import type { CartStackScreenProps } from '../CartStack';
 import { HomeScreen, SectorScreen } from 'src/features/events';
 import type { IEvent, ISections } from 'src/model/eventDTO';
 import { Colors } from 'src/styleguide/colors';
+import type { CartStackScreenProps } from '../CartStack';
+import type { MainTabScreenProps } from '../MainTabNavigator';
 import { Header } from '../components/Header';
 import { ROUTES } from '../constants/routes';
 
@@ -25,7 +26,7 @@ export type EventsTabHomeParamList = {
 export type EventStackScreenProps<T extends keyof EventsTabHomeParamList> =
   CompositeScreenProps<
     NativeStackScreenProps<EventsTabHomeParamList, T>,
-    CartStackScreenProps<'CartTabHome.itself'>
+    MainTabScreenProps<'MainTab.Cart'>
   >;
 
 const Stack = createNativeStackNavigator<EventsTabHomeParamList>();

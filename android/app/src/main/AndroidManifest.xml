@@ -2,6 +2,9 @@
   package="com.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="br.com.uol.pagseguro.permission.MANAGE_PAYMENTS" />
+
+    <!-- <permission android:name="br.com.br.com.permission.MANAGE_PAYMENTS" /> -->
 
     <application
       android:name=".MainApplication"

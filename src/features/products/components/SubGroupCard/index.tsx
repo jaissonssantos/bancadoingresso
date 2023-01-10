@@ -2,14 +2,14 @@ import React from 'react';
 import { View, ViewStyle } from 'react-native';
 import { PressableOpacity } from 'src/components/PressableOpacity';
 import { Text, TextAligns, TextSizes } from 'src/components/Text';
-import type { ISubGroup } from 'src/features/products/model/subgroupDTO';
+import type { ISubGroups } from 'src/model/groupDTO';
 import { styles } from './styles';
 
 interface SubGroupCardProps {
-  data?: ISubGroup[];
+  data?: ISubGroups[];
   style?: ViewStyle | ViewStyle[] | undefined;
   containerStyle?: ViewStyle | ViewStyle[] | undefined;
-  onPress: (subgroup: ISubGroup) => void;
+  onPress: (subgroup: ISubGroups) => void;
 }
 
 export const SubGroupCard: React.FC<SubGroupCardProps> = ({
@@ -28,13 +28,13 @@ export const SubGroupCard: React.FC<SubGroupCardProps> = ({
       {data.map(item => (
         <PressableOpacity
           onPress={(): void => onPress(item)}
-          key={item.id}
+          key={item.productSubGroupId}
           style={[styles.item, style]}>
           <Text
             size={TextSizes.xsmall}
             align={TextAligns.center}
             style={styles.title}>
-            {item.name}
+            {item.productSubGroupName}
           </Text>
         </PressableOpacity>
       ))}

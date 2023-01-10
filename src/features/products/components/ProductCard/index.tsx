@@ -25,6 +25,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   isAvailableClearCart = false,
   style,
 }) => {
+  const quantity = product.quantity ?? 0;
+  const maxLimit = product.amount ?? 0;
+
   const finalStyleButtonSubtract = [
     product.quantity === 0 ? { opacity: 0.5 } : {},
   ];
@@ -32,9 +35,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <View style={[styles.container, style]}>
       <View style={[styles.item, style]}>
-        {product.image && (
+        {product.imageBase64 && (
           <FastImage
-            source={{ uri: product.image }}
+            source={{ uri: product.imageBase64 }}
             style={StyleSheet.absoluteFill}
           />
         )}
@@ -49,7 +52,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           style={styles.fade}>
           <View style={styles.row}>
             <View style={[styles.row, styles.actions]}>
-              {isAvailableClearCart && product.quantity === 1 ? (
+              {isAvailableClearCart && quantity === 1 ? (
                 <PressableOpacity onPress={(): void => onSubtract(product)}>
                   <TrashIcon
                     size={IconSizes.small}
@@ -59,17 +62,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               ) : (
                 <PressableOpacity
                   onPress={(): void => onSubtract(product)}
-                  disabled={product.quantity === 0}
+                  disabled={quantity === 0}
                   style={finalStyleButtonSubtract}>
                   <SubtractIcon size={IconSizes.small} stroke={Colors.white} />
                 </PressableOpacity>
               )}
 
               <Text size={TextSizes.medium} style={styles.textQuantity}>
-                {product.quantity}
+                {quantity}
               </Text>
 
-              <PressableOpacity onPress={(): void => onAdd(product)}>
+              <PressableOpacity
+                onPress={(): void => onAdd(product)}
+                disabled={quantity >= maxLimit}>
                 <PlusIcon size={IconSizes.small} stroke={Colors.white} />
               </PressableOpacity>
             </View>
@@ -82,7 +87,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {product.name}
         </Text>
         <Text size={TextSizes.small} weight={TextWeights.medium}>
-          {toString(product.price ?? 0)}
+          {toString(product.unitValue ?? 0)}
         </Text>
       </View>
     </View>

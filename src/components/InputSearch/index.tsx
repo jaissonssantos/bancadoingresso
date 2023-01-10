@@ -84,6 +84,9 @@ export const InputSearch = memo<InputSearchProps>(
                 onEndEditing={(): boolean => (isFocused.value = false)}
                 onChangeText={(text: string): void => onChangeText(name, text)}
                 value={value}
+                autoComplete="off"
+                autoCorrect={false}
+                cursorColor={Colors.whiteDarkLight}
                 {...rest}
               />
             </Animated.View>

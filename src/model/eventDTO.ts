@@ -1,4 +1,4 @@
-// import type { ISector } from './sectorDTO';
+import type { IGroup } from './groupDTO';
 
 export interface IFees {
   id: string;
@@ -40,6 +40,7 @@ export interface ISection {
 
 export interface ISections {
   section: ISection;
+  group: IGroup[];
   tickets: ITickets[];
 }
 

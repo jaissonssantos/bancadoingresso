@@ -19,33 +19,35 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addItemToCart(state, { payload }: PayloadAction<IProduct>) {
-      const newItem = payload;
+      console.log('payload >>> ', payload);
 
       const existingItem = state.items.find(
         item =>
-          item.id === newItem.id &&
-          item.name === newItem.name &&
-          item.isHalfPrice === newItem.isHalfPrice,
+          item.id === payload.id &&
+          item.name === payload.name &&
+          item.isHalfPrice === payload.isHalfPrice,
       );
 
+      console.log('existingItem >>>', existingItem);
+
       state.totalQuantity++;
-      state.totalAmount += newItem?.value ?? 0;
+      state.totalAmount += payload?.value ?? 0;
 
       if (!existingItem) {
         state.items.push({
-          id: newItem.id,
-          name: newItem.name,
-          count: newItem.count,
-          value: newItem.value,
-          isHalfPrice: newItem.isHalfPrice ?? false,
+          id: payload.id,
+          name: payload.name,
+          count: payload.count,
+          value: payload.value,
+          isHalfPrice: payload.isHalfPrice ?? false,
           quantity: 1,
-          totalPrice: newItem.value,
-          payment: newItem.payment,
+          totalPrice: payload.value,
+          payment: payload.payment,
         });
       } else {
         const quantity = existingItem?.quantity ?? 1;
         const totalPrice = existingItem?.totalPrice ?? 0;
-        const value = newItem?.value ?? 0;
+        const value = payload?.value ?? 0;
 
         existingItem.quantity = quantity + 1;
         existingItem.totalPrice = totalPrice + value;

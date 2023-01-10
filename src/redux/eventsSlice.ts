@@ -1,4 +1,5 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { IProduct } from 'src/model/productDTO';
 import type { IEvent } from 'src/model/eventDTO';
 import { getEventsHome } from 'src/features/events/services';
 import type { RootState } from './rootState';
@@ -25,7 +26,37 @@ export const fetchEvents = createAsyncThunk<IEvent[], string, {}>(
 const eventsSlice = createSlice({
   name: 'events',
   initialState,
-  reducers: {},
+  reducers: {
+    addProductBySubGroup(
+      state,
+      { payload }: PayloadAction<{ subGroup: string; products: IProduct[] }>,
+    ) {
+      const newEvents = state.events.map(event => ({
+        ...event,
+        sections: event.sections.map(section => ({
+          ...section,
+          group: section.group?.map(groupItem => ({
+            ...groupItem,
+            subGroups: groupItem.subGroups.map(subGroup => {
+              if (subGroup.productSubGroupId === payload.subGroup) {
+                return {
+                  ...subGroup,
+                  products: payload.products,
+                };
+              }
+
+              return {
+                ...subGroup,
+                products: [],
+              };
+            }),
+          })),
+        })),
+      }));
+
+      state.events = newEvents;
+    },
+  },
   extraReducers: builder => {
     builder.addCase(fetchEvents.pending, state => {
       state.status = 'loading';
@@ -41,6 +72,8 @@ const eventsSlice = createSlice({
 });
 
 export default eventsSlice.reducer;
+
+export const { addProductBySubGroup } = eventsSlice.actions;
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useEvents = (state: RootState) => state.events;

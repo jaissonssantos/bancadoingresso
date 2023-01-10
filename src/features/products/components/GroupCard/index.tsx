@@ -4,7 +4,7 @@ import FadeBackground from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import { PressableOpacity } from 'src/components/PressableOpacity';
 import { Text, TextAligns, TextSizes } from 'src/components/Text';
-import type { IGroup } from 'src/features/products/model/groupDTO';
+import type { IGroup } from 'src/model/groupDTO';
 import { Colors } from 'src/styleguide/colors';
 import { styles } from './styles';
 
@@ -31,10 +31,10 @@ export const GroupCard: React.FC<GroupCardProps> = ({
       {data.map(item => (
         <PressableOpacity
           onPress={(): void => onPress(item)}
-          key={item.id}
+          key={item.categoryGroupId}
           style={[styles.item, style]}>
           <FastImage
-            source={{ uri: item.image }}
+            source={{ uri: item.categoryGroupImage }}
             style={StyleSheet.absoluteFill}
           />
           <FadeBackground
@@ -49,7 +49,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({
               size={TextSizes.xsmall}
               align={TextAligns.center}
               style={styles.title}>
-              {item.name}
+              {item.categoryGroupName}
             </Text>
           </FadeBackground>
         </PressableOpacity>

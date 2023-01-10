@@ -10,10 +10,8 @@ import {
   SectorScreen,
   SubGroupScreen,
 } from 'src/features/products';
-import type { IEvent } from 'src/features/products/model/eventDTO';
-import type { ISector } from 'src/features/products/model/sectorDTO';
-import type { IGroup } from 'src/features/products/model/groupDTO';
-import type { ISubGroup } from 'src/features/products/model/subgroupDTO';
+import type { IEvent, ISections } from 'src/model/eventDTO';
+import type { IGroup, ISubGroups } from 'src/model/groupDTO';
 import type { CartStackScreenProps } from '../CartStack';
 import { Colors } from 'src/styleguide/colors';
 import { Header } from '../components/Header';
@@ -21,15 +19,23 @@ import { ROUTES } from '../constants/routes';
 
 const { ProductsTabHome: PRODUCTS_TAB_HOME_ROUTES } = ROUTES;
 
-export interface SectorStackParam extends ISector {
+export interface SectorStackParam extends ISections {
+  event?: IEvent;
+}
+
+export interface SubGroupStackParam extends IGroup {
+  event?: IEvent;
+}
+
+export interface ProductStackParam extends ISubGroups {
   event?: IEvent;
 }
 
 export type ProductsTabHomeParamList = {
   [PRODUCTS_TAB_HOME_ROUTES.itself]: undefined;
   [PRODUCTS_TAB_HOME_ROUTES.Sector]: SectorStackParam;
-  [PRODUCTS_TAB_HOME_ROUTES.SubGroup]: IGroup;
-  [PRODUCTS_TAB_HOME_ROUTES.Product]: ISubGroup;
+  [PRODUCTS_TAB_HOME_ROUTES.SubGroup]: SubGroupStackParam;
+  [PRODUCTS_TAB_HOME_ROUTES.Product]: ProductStackParam;
 };
 
 export type ProductsStackScreenProps<T extends keyof ProductsTabHomeParamList> =

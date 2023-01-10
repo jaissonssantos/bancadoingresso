@@ -17,6 +17,7 @@ import { KeyboardAwareScrollView } from 'src/components/KeyboardAwareScrollView'
 import loginBg from 'src/features/auth/assets/images/bg_login.png';
 import { Colors } from 'src/styleguide/colors';
 import type { UseFormReturn } from 'src/hooks/useForm';
+import { beepNFC, readNFCCard } from 'src/core/native_modules/nfc';
 import { styles } from './styles';
 
 export enum LoginUIStates {
@@ -137,9 +138,10 @@ export const LoginUI: React.FC<LoginUIProps> = ({
           <View style={styles.flex1} />
           <Button
             type={ButtonType.primary}
-            onPress={onLoginPress}
-            disabled={state === LoginUIStates.loading}
-            loading={state === LoginUIStates.loading}
+            // onPress={onLoginPress}
+            onPress={readNFCCard}
+            // disabled={state === LoginUIStates.loading}
+            // loading={state === LoginUIStates.loading}
             title="Entrar"
           />
         </SafeAreaView>

@@ -17,8 +17,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   const { token } = useAuth();
 
-  // clearAuthState();
-
   const { formData, onChangeInput } = useForm<SearchFormData>({
     initialData: { query: '' },
   });

@@ -4,9 +4,8 @@ import dayjs from 'dayjs';
 import { Text, TextSizes, TextWeights } from 'src/components/Text';
 import { InputSearch } from 'src/components/InputSearch';
 import type { UseFormReturn } from 'src/hooks/useForm';
-import type { ISector } from 'src/features/products/model/sectorDTO';
-import type { IGroup } from 'src/features/products/model/groupDTO';
-import type { IEvent } from 'src/features/products/model/eventDTO';
+import type { IEvent, ISections } from 'src/model/eventDTO';
+import type { IGroup } from 'src/model/groupDTO';
 import { Colors } from 'src/styleguide/colors';
 import { GroupCard } from 'src/features/products/components/GroupCard';
 import { styles } from './styles';
@@ -15,7 +14,7 @@ export type SearchFormData = {
   query: string;
 };
 
-export interface ISectorData extends Partial<ISector> {
+export interface ISectorData extends Partial<ISections> {
   event?: IEvent;
 }
 
@@ -56,8 +55,8 @@ export const SectorUI: React.FC<SectorUIProps> = ({
         style={styles.spacingBottomLarge}>
         Evento selecionado: {sectorData.event?.name}
         {' • '}
-        {`${dayjs(sectorData.event?.date).format('DD/MM')} • ${dayjs(
-          sectorData.event?.date,
+        {`${dayjs(sectorData.event?.startDate).format('DD/MM')} • ${dayjs(
+          sectorData.event?.startDate,
         ).format('dddd')}`}
       </Text>
 
@@ -69,7 +68,7 @@ export const SectorUI: React.FC<SectorUIProps> = ({
         Grupo
       </Text>
 
-      <GroupCard data={sectorData.items} onPress={onGoToSubGroup} />
+      <GroupCard data={sectorData.group} onPress={onGoToSubGroup} />
     </ScrollView>
   </View>
 );

@@ -17,18 +17,20 @@ export const PaymentCartInputScreen: React.FC<PaymentCartInputScreenProps> = ({
 
   const { formData, formErrors, onChangeInput } =
     useForm<PaymentCartInputFormData>({
-      initialData: { amount: toString(0) },
-      formatters: { amount: toString },
+      // initialData: { amount: toString(0) },
+      // formatters: { amount: toString },
+      initialData: { amount: '0' },
+      // formatters: { amount: toString },
     });
 
   const handleOnChangeAmount = (amount: string): void => {
-    const amountNumber = convertAmountToNumber(amount);
+    // const amountNumber = convertAmountToNumber(amount);
 
-    if (amountNumber > MAX_AMOUNT) {
-      return;
-    }
+    // if (amountNumber > MAX_AMOUNT) {
+    //   return;
+    // }
 
-    onChangeInput('amount', amount);
+    onChangeInput('amount', toString(amount));
   };
 
   const handleOnPaymentTypeChoice = (): void => {
@@ -39,7 +41,8 @@ export const PaymentCartInputScreen: React.FC<PaymentCartInputScreenProps> = ({
 
   useEffect(() => {
     if (cart.totalAmount) {
-      handleOnChangeAmount(toString(cart.totalAmount));
+      // handleOnChangeAmount(toString(cart.totalAmount));
+      // handleOnChangeAmount(cart.totalAmount.toString());
     }
   }, [cart]);
 
