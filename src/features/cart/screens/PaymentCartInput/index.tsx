@@ -4,7 +4,6 @@ import { useCart } from 'src/redux/cartSlice';
 import { useForm } from 'src/hooks/useForm';
 import { toString, convertAmountToNumber } from 'src/util/currency';
 import type { CartStackScreenProps } from 'src/navigation/CartStack';
-import { MAX_AMOUNT } from 'src/constants';
 import { PaymentCartInputUI, PaymentCartInputFormData } from './ui';
 
 type PaymentCartInputScreenProps =
@@ -17,20 +16,14 @@ export const PaymentCartInputScreen: React.FC<PaymentCartInputScreenProps> = ({
 
   const { formData, formErrors, onChangeInput } =
     useForm<PaymentCartInputFormData>({
-      // initialData: { amount: toString(0) },
-      // formatters: { amount: toString },
-      initialData: { amount: '0' },
-      // formatters: { amount: toString },
+      initialData: { amount: toString(0) },
+      formatters: { amount: toString },
     });
 
   const handleOnChangeAmount = (amount: string): void => {
-    // const amountNumber = convertAmountToNumber(amount);
+    const amountNumber = convertAmountToNumber(amount) / 100;
 
-    // if (amountNumber > MAX_AMOUNT) {
-    //   return;
-    // }
-
-    onChangeInput('amount', toString(amount));
+    onChangeInput('amount', amountNumber);
   };
 
   const handleOnPaymentTypeChoice = (): void => {

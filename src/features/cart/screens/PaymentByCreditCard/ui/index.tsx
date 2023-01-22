@@ -11,6 +11,7 @@ import { Colors } from 'src/styleguide/colors';
 import { BottomSheetReceipt } from 'src/components/BottomSheetReceipt';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
 import { styles } from './styles';
+import { log } from 'src/util/log';
 
 export enum States {
   loading = 'loading',
@@ -24,8 +25,14 @@ interface PaymentByCreditCardUIProps {
   installment: Installment;
   state: States;
   visible: boolean;
+  statusPayment: string;
   onPaymentContinue: () => void;
   onCancel: () => void;
+}
+
+export interface PaymentByCreditCardEventListener {
+  message: string;
+  code: string;
 }
 
 export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
@@ -33,6 +40,7 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
   installment,
   visible,
   state,
+  statusPayment,
   onPaymentContinue,
   onCancel,
 }) => {
@@ -60,6 +68,8 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
     </React.Fragment>
   );
 
+  log.i('statusPayment >>>', statusPayment);
+
   return (
     <React.Fragment>
       <SafeAreaView edges={['top']} style={styles.safeArea}>
@@ -69,7 +79,7 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
             weight={TextWeights.regular}
             align={TextAligns.center}
             style={[styles.spacingTop, styles.spacingBottom]}>
-            Aproxime, insira ou passe o seu cartão
+            {statusPayment}
           </Text>
 
           <View style={styles.selfCenter}>

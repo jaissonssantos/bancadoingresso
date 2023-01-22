@@ -1,6 +1,8 @@
 package com.app;
 
 import com.app.pagseguro.NFCModule;
+import com.app.pagseguro.PaymentModule;
+import com.app.pagseguro.AuthenticationModule;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
@@ -30,7 +32,9 @@ public class ReactNativePackages implements ReactPackage {
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
     List<NativeModule> modules = new ArrayList<>();
+    modules.add(new AuthenticationModule(reactContext));
     modules.add(new NFCModule(reactContext));
+    modules.add(new PaymentModule(reactContext));
 
     if (BuildConfig.DEBUG) {
       // modules.add(new DevMenuManager(reactContext, mReactNativeHost));

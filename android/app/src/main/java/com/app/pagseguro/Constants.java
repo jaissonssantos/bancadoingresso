@@ -2,6 +2,10 @@ package com.app.pagseguro;
 
 public class Constants {
 
+    // App Identification
+    public static final String APP_IDENTIFICATION = "BDI";
+    public static final String APP_VERSION = "1.0.0";
+
     //App Reference Constants
     public static final String USER_REFERENCE = "BDI";
 

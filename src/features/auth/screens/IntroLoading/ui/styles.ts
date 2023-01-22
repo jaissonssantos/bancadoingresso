@@ -12,7 +12,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loading: {
-    marginTop: verticalScale(20),
+    marginVertical: verticalScale(20),
+  },
+  message: {
+    color: Colors.white,
   },
 });
 

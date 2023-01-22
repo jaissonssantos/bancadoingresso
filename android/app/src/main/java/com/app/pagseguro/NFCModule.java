@@ -25,6 +25,7 @@ import static com.app.pagseguro.Constants.LED_OFF_SUCCESS;
 
 public class NFCModule extends ReactContextBaseJavaModule {
     PlugPag mPlugPag;
+    String TAG = "NFCModule";
 
     public NFCModule(ReactApplicationContext context) {
         super(context);
@@ -45,7 +46,7 @@ public class NFCModule extends ReactContextBaseJavaModule {
         );
 
         if (result == NFC_OK) {
-            Log.d("NFCModule", "event called beep NFC: " + result);
+            Log.d(TAG, "event called beep NFC: " + result);
         } else {
             new PlugPagException(BEEP_FAIL);
         }
@@ -57,9 +58,6 @@ public class NFCModule extends ReactContextBaseJavaModule {
     public void readNFCCard(Promise promise) {
         try {
             PlugPagNearFieldCardData cardData = new PlugPagNearFieldCardData();
-
-            cardData.setStartSlot(28);
-            cardData.setEndSlot(28);
 
             PlugPagNFCResult result = mPlugPag.readFromNFCCard(cardData);
 
