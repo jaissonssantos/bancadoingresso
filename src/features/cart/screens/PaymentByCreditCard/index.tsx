@@ -1,15 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { NativeEventEmitter } from 'react-native';
+import { log } from 'src/util/log';
 import { useCart, removeAllItemFromCart } from 'src/redux/cartSlice';
 import type { CartStackScreenProps } from 'src/navigation/CartStack';
-import { PaymentModule, startPayment } from 'src/core/native_modules/payment';
+import {
+  PaymentModule,
+  startPaymentEventListener,
+  startPayment,
+} from 'src/core/native_modules/payment';
 import {
   PaymentByCreditCardUI,
   PaymentByCreditCardEventListener,
   States,
 } from './ui';
-import { NativeEventEmitter } from 'react-native';
-import { log } from 'src/util/log';
 
 type PaymentByCreditCardScreenProps =
   CartStackScreenProps<'CartTabHome.PaymentByCreditCard'>;
@@ -17,14 +21,15 @@ type PaymentByCreditCardScreenProps =
 export const PaymentByCreditCardScreen: React.FC<
   PaymentByCreditCardScreenProps
 > = ({ navigation, route }) => {
-  const eventEmitter = new NativeEventEmitter(PaymentModule);
-
   const installment = route.params.installment;
   const cart = useSelector(useCart);
   const [visible, setVisible] = useState(false);
   const [state, setState] = useState(States.loading);
-  const statusPayment = useRef('Aproxime, insira ou passe o seu cartão');
+  const [statusPayment, setStatusPayment] = useState(
+    'Aproxime, insira ou passe o seu cartão',
+  );
   const dispatch = useDispatch();
+  const eventEmitter = new NativeEventEmitter(PaymentModule);
 
   const handleOnContinue = (): void => {
     setState(States.loading);
@@ -50,8 +55,11 @@ export const PaymentByCreditCardScreen: React.FC<
   }, [state]);
 
   useEffect(() => {
-    new Promise(resolve => setTimeout(resolve, 2000)).then(() => {
-      startPayment();
+    new Promise(resolve => setTimeout(resolve, 1000)).then(async () => {
+      startPaymentEventListener();
+
+      const response = await startPayment();
+      log.i(`Response do payment: ${JSON.stringify(response || {})}`);
     });
 
     // startPayment();
@@ -70,21 +78,15 @@ export const PaymentByCreditCardScreen: React.FC<
     });
   }, [navigation]);
 
-  const handleOnStatusPaymentEmitter = (
-    data: PaymentByCreditCardEventListener,
-  ): void => {
-    if (data?.code) {
-      statusPayment.current = 'banana';
-      // statusPayment.current = data.message;
-      log.i(`Status atual: ${JSON.stringify(data || {})}`);
-    }
-  };
-
   useEffect(() => {
     const eventListener = eventEmitter.addListener(
       'statusPayment',
-      (data: PaymentByCreditCardEventListener): void =>
-        handleOnStatusPaymentEmitter(data),
+      (data: PaymentByCreditCardEventListener): void => {
+        if (data.code) {
+          log.i(`Status da operação: ${JSON.stringify(data || {})}`);
+          setStatusPayment(data.message);
+        }
+      },
     );
 
     return (): void => {
@@ -99,7 +101,7 @@ export const PaymentByCreditCardScreen: React.FC<
       installment={installment}
       state={state}
       visible={visible}
-      statusPayment={statusPayment.current}
+      statusPayment={statusPayment}
       onPaymentContinue={handleOnContinue}
       onCancel={handleOnCancel}
     />

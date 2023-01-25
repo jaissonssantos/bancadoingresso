@@ -1,8 +1,5 @@
 package com.app.pagseguro;
 
-import static com.app.pagseguro.Constants.APP_IDENTIFICATION;
-import static com.app.pagseguro.Constants.APP_VERSION;
-
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -14,7 +11,6 @@ import com.facebook.react.bridge.ReactMethod;
 
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagActivationData;
-import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagAppIdentification;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagInitializationResult;
 import br.com.uol.pagseguro.plugpagservice.wrapper.exception.PlugPagException;
 
@@ -25,8 +21,7 @@ public class AuthenticationModule extends ReactContextBaseJavaModule {
     public AuthenticationModule(ReactApplicationContext context) {
         super(context);
 
-        PlugPagAppIdentification appIdentification = new PlugPagAppIdentification(APP_IDENTIFICATION, APP_VERSION);
-        mPlugPag = new PlugPag(context, appIdentification);
+        mPlugPag = new PlugPag(context);
     }
 
     @NonNull
@@ -41,7 +36,7 @@ public class AuthenticationModule extends ReactContextBaseJavaModule {
     };
 
     @ReactMethod
-    public void initializeAndActivatePinpad(String activationCode, final Promise promise) {
+    public void initializeAndActivatePinpad(String activationCode, Promise promise) {
         try {
             PlugPagInitializationResult result = mPlugPag.initializeAndActivatePinpad(new PlugPagActivationData(activationCode));
 
@@ -49,7 +44,7 @@ public class AuthenticationModule extends ReactContextBaseJavaModule {
                 Log.i(TAG, "Call initializeAndActivatePinpad success");
                 promise.resolve(result.getResult());
             } else {
-                new PlugPagException(result.getErrorMessage());
+                promise.reject(new PlugPagException(result.getErrorMessage()));
             }
         } catch (Exception e) {
             promise.reject(e.getMessage());
@@ -65,7 +60,7 @@ public class AuthenticationModule extends ReactContextBaseJavaModule {
                 Log.i(TAG, "Call deactivate success");
                 promise.resolve(result.getResult());
             } else {
-                new PlugPagException(result.getErrorMessage());
+                promise.reject(new PlugPagException(result.getErrorMessage()));
             }
         } catch (Exception e) {
             promise.reject(e.getMessage());

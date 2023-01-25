@@ -10,8 +10,8 @@ import { toString } from 'src/util/currency';
 import { Colors } from 'src/styleguide/colors';
 import { BottomSheetReceipt } from 'src/components/BottomSheetReceipt';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
-import { styles } from './styles';
 import { log } from 'src/util/log';
+import { styles } from './styles';
 
 export enum States {
   loading = 'loading',

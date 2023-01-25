@@ -43,18 +43,23 @@ export const IntroLoadingScreen: React.FC<IntroLoadingScreenProps> = ({
 
     if (isActive) {
       log.i('initialized pinpad');
-      handleAuthState();
+      await handleAuthState();
     } else {
       try {
         await initializeAndActivatePinpad('403938');
-        handleAuthState();
+        await handleAuthState();
       } catch (error) {
-        log.e(`Error initializing pinpad with error: ${error}`);
+        const parseError = error as Error;
+
+        log.i(
+          `Error initializing pinpad: ${error} - ${JSON.stringify(parseError)}`,
+        );
         snackbar.show({
-          message:
-            'Não foi possível habilitar seu terminal. Por favor habilite em Configurações > Autenticação',
+          message: parseError.message,
           type: 'danger',
         });
+
+        await handleAuthState();
       }
     }
   };

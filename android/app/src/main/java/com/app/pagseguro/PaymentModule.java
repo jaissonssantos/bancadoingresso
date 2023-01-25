@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -36,9 +37,7 @@ public class PaymentModule extends ReactContextBaseJavaModule {
         super(context);
         reactContext = context;
 
-        PlugPagAppIdentification appIdentification = new PlugPagAppIdentification(APP_IDENTIFICATION, APP_VERSION);
-
-        mPlugPag = new PlugPag(context, appIdentification);
+        mPlugPag = new PlugPag(context);
     }
 
     @NonNull
@@ -48,24 +47,35 @@ public class PaymentModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startPayment() {
-        Log.i(TAG, "Call startPayment");
-
-        Handler handler = new Handler(this.getReactApplicationContext().getMainLooper());
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                doCreditPaymentBuyerInstallments(30000, 1);
-            }
-        }, 100);
+    public void startPaymentEventListener() {
+        setEventListener();
     }
 
-    public void doCreditPaymentBuyerInstallments(int value, int installments) {
+    @ReactMethod
+    public void startPayment(Promise promise) {
+        Log.i(TAG, "Call startPayment");
+
+//        Handler handler = new Handler(getReactApplicationContext().getMainLooper());
+//
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+
+                try {
+                    PlugPagTransactionResult result = doCreditPaymentBuyerInstallments(30000, 1);
+
+                    promise.resolve(result.getMessage());
+                } catch (Exception e) {
+                    promise.reject(e.getMessage());
+                }
+//            }
+//        }, 500);
+    }
+
+    public PlugPagTransactionResult doCreditPaymentBuyerInstallments(int value, int installments) {
         Log.i(TAG, "Call doCreditPaymentBuyerInstallments");
 
-        setEventListener();
-        PlugPagTransactionResult plugPagTransactionResult = doPayment(new PlugPagPaymentData(
+        return doPayment(new PlugPagPaymentData(
                 TYPE_CREDITO,
                 value,
                 INSTALLMENT_TYPE_A_VISTA,
@@ -73,38 +83,35 @@ public class PaymentModule extends ReactContextBaseJavaModule {
                 USER_REFERENCE,
                 false
         ));
-
-        Log.i(TAG, "return payment" + plugPagTransactionResult.getResult());
     }
 
     private PlugPagTransactionResult doPayment(final PlugPagPaymentData paymentData) {
-       mPlugPagPaymentData = paymentData;
+        mPlugPagPaymentData = paymentData;
 
-        Log.i(TAG, "Call doPayment" + paymentData.toString());
+        PlugPagTransactionResult plugPagTransactionResult = mPlugPag.doPayment(paymentData);
 
-        PlugPagTransactionResult plugPagTransactionResult = mPlugPag.doPayment(paymentDataPayload);
-
-        Log.i(TAG, "Call doPayment" + plugPagTransactionResult.getMessage());
+        Log.i(TAG, "Call doPayment: " + plugPagTransactionResult.getMessage());
 
         return plugPagTransactionResult;
     }
 
-    private void sendEvent(ReactContext reactContext, String eventName, @Nullable WritableMap params) {
-        reactContext
+    private void sendEvent(String eventName, @Nullable WritableMap params) {
+        Log.i(TAG, "params: " + params.toString());
+
+        getReactApplicationContext()
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(eventName, params);
     }
 
     private void setEventListener() {
         mPlugPag.setEventListener(plugPagEventData -> {
-            Log.i(TAG, "code: " + plugPagEventData.getEventCode());
-            Log.i(TAG, "message: " + plugPagEventData.getCustomMessage());
-
             WritableMap params = Arguments.createMap();
             params.putString("message", plugPagEventData.getCustomMessage());
             params.putString("code", String.valueOf(plugPagEventData.getEventCode()));
 
-            sendEvent(reactContext, "statusPayment", params);
+            if(plugPagEventData.getEventCode() != 0){
+                sendEvent("statusPayment", params);
+            }
         });
     }
 }

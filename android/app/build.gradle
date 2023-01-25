@@ -267,7 +267,7 @@ dependencies {
     
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
 
-    implementation 'br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.9.0'
+    implementation 'br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.22.0'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'

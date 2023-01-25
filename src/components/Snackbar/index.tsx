@@ -55,10 +55,7 @@ const Snackbar: React.FC<SnackbarProps> = ({
         { transform: [{ translateY: translateYRef.current }] },
       ]}>
       <TouchableOpacity onPress={onClose} style={finalContainerStyle}>
-        <View style={styles.icon}>
-          <NoteIcon size={IconSizes.xmedium} fill={Colors.white} />
-        </View>
-        <Text size={TextSizes.xsmall} style={styles.text}>
+        <Text size={TextSizes.small} style={styles.text}>
           {message}
         </Text>
       </TouchableOpacity>
