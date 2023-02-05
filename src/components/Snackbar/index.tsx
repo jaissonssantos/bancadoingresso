@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, TouchableOpacity, View } from 'react-native';
+import { Animated, Easing, TouchableOpacity } from 'react-native';
 import { Text, TextSizes } from 'src/components/Text';
-import { NoteIcon, IconSizes } from 'src/assets/icons';
-import { Colors } from 'src/styleguide/colors';
 import styles from './styles';
 
 export type SnackbarType = 'default' | 'success' | 'danger' | 'info';

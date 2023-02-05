@@ -3,6 +3,7 @@ import type { IEvent } from 'src/model/eventDTO';
 import type { IGroup } from 'src/model/groupDTO';
 import type { IProduct } from 'src/model/productDTO';
 import { request } from 'src/services/request';
+import { log } from 'src/util/log';
 
 export const getProduct = async (
   accessToken: string,
@@ -36,12 +37,17 @@ export const getGroup = async (
 export const getEvent = async (
   accessToken: string,
   event: string,
-): Promise<IEvent> => {
-  const { data } = await request.get<IEvent>(`${ApiRoutes.event}/${event}`, {
-    accessToken,
-  });
+): Promise<IEvent | null> => {
+  try {
+    const { data } = await request.get<IEvent>(`${ApiRoutes.event}/${event}`, {
+      accessToken,
+    });
 
-  return data;
+    return data;
+  } catch (error) {
+    log.i(`request error ${ApiRoutes.event}/${event} ${error}`);
+    return null;
+  }
 };
 
 export const getEventsHome = async (accessToken: string): Promise<IEvent[]> => {
@@ -52,6 +58,10 @@ export const getEventsHome = async (accessToken: string): Promise<IEvent[]> => {
   const newData = await Promise.all(
     data.map(async event => {
       const eventData = await getEvent(accessToken, event.id);
+
+      if (!eventData) {
+        return event;
+      }
 
       try {
         const groupData = await getGroup(accessToken, event.id);

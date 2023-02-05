@@ -9,18 +9,23 @@ import {
 import { useAuth } from 'src/contexts/AuthContext/useAuth';
 import { IntroLoadingScreen, LoginScreen } from 'src/features/auth';
 import {
-  NewServiceCategoryScreen,
-  NewServiceScreen,
-} from 'src/features/services';
+  PaymentChoiceByInstallmentScreen,
+  PaymentByCreditCardScreen,
+} from 'src/features/cart';
+import type { Installment } from 'src/features/cart/model/installmentDTO';
 import { Colors } from 'src/styleguide/colors';
 import { Header } from '../components/Header';
 import { ROUTES } from '../constants/routes';
 import { MainTabNavigator, MainTabParamList } from '../MainTabNavigator';
 import { StyleSheet } from 'react-native';
 
+interface PaymentByCreditCardStack {
+  installment: Installment;
+}
+
 const {
   Auth: AUTH_ROUTES,
-  Services: SERVICES_ROUTES,
+  Payments: PAYMENTS_ROUTES,
   MainTab: MAIN_TAB_ROUTES,
 } = ROUTES;
 
@@ -28,8 +33,8 @@ export type RootStackParamList = {
   [AUTH_ROUTES.IntroLoading]: undefined;
   [AUTH_ROUTES.Login]: undefined;
   [MAIN_TAB_ROUTES.Itself]: NavigatorScreenParams<MainTabParamList> | undefined;
-  [SERVICES_ROUTES.NewService]: undefined;
-  [SERVICES_ROUTES.NewServiceCategory]: undefined;
+  [PAYMENTS_ROUTES.PaymentChoiceByInstallment]: undefined;
+  [PAYMENTS_ROUTES.PaymentByCreditCard]: PaymentByCreditCardStack;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
@@ -63,14 +68,14 @@ export const RootStack: React.FC = () => {
                 component={MainTabNavigator}
               />
               <Stack.Screen
-                name={SERVICES_ROUTES.NewService}
-                component={NewServiceScreen}
-                options={{ title: 'Adicionar serviço' }}
+                name={PAYMENTS_ROUTES.PaymentChoiceByInstallment}
+                component={PaymentChoiceByInstallmentScreen}
+                options={{ title: 'Crédito' }}
               />
               <Stack.Screen
-                name={SERVICES_ROUTES.NewServiceCategory}
-                component={NewServiceCategoryScreen}
-                options={{ title: 'Adicionar categoria' }}
+                name={PAYMENTS_ROUTES.PaymentByCreditCard}
+                component={PaymentByCreditCardScreen}
+                options={{ title: 'Crédito' }}
               />
             </>
           ) : (

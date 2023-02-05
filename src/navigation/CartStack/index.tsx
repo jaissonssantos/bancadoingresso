@@ -1,3 +1,4 @@
+import type { CompositeScreenProps } from '@react-navigation/native';
 import {
   createNativeStackNavigator,
   NativeStackScreenProps,
@@ -10,22 +11,16 @@ import {
   PaymentByCashScreen,
   PaymentByPixScreen,
   PaymentByDebitCardScreen,
-  PaymentChoiceByInstallmentScreen,
-  PaymentByCreditCardScreen,
 } from 'src/features/cart';
-import type { Installment } from 'src/features/cart/model/installmentDTO';
 import { Colors } from 'src/styleguide/colors';
 import { Header } from '../components/Header';
 import { ROUTES } from '../constants/routes';
+import type { RootStackScreenProps } from '../RootStack';
 
 const { CartTabHome: CART_TAB_HOME_ROUTES } = ROUTES;
 
 interface CartStackAmount {
   amount: number;
-}
-
-interface PaymentByCreditCardStack {
-  installment: Installment;
 }
 
 export type CartTabHomeParamList = {
@@ -36,11 +31,13 @@ export type CartTabHomeParamList = {
   [CART_TAB_HOME_ROUTES.PaymentByPix]: undefined;
   [CART_TAB_HOME_ROUTES.PaymentByDebitCard]: undefined;
   [CART_TAB_HOME_ROUTES.PaymentChoiceByInstallment]: undefined;
-  [CART_TAB_HOME_ROUTES.PaymentByCreditCard]: PaymentByCreditCardStack;
 };
 
 export type CartStackScreenProps<T extends keyof CartTabHomeParamList> =
-  NativeStackScreenProps<CartTabHomeParamList, T>;
+  CompositeScreenProps<
+    NativeStackScreenProps<CartTabHomeParamList, T>,
+    RootStackScreenProps<'MainTab.Itself'>
+  >;
 
 const Stack = createNativeStackNavigator<CartTabHomeParamList>();
 
@@ -81,16 +78,6 @@ export const CartStack: React.FC = () => {
         name={CART_TAB_HOME_ROUTES.PaymentByDebitCard}
         component={PaymentByDebitCardScreen}
         options={{ title: 'Débito à vista' }}
-      />
-      <Stack.Screen
-        name={CART_TAB_HOME_ROUTES.PaymentChoiceByInstallment}
-        component={PaymentChoiceByInstallmentScreen}
-        options={{ title: 'Crédito' }}
-      />
-      <Stack.Screen
-        name={CART_TAB_HOME_ROUTES.PaymentByCreditCard}
-        component={PaymentByCreditCardScreen}
-        options={{ title: 'Crédito' }}
       />
     </Stack.Navigator>
   );

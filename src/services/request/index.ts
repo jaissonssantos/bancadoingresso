@@ -47,7 +47,7 @@ const requestCreator =
     log.d(`${method} ${endpoint} (${response.status}) ${dataText}`);
 
     if (response.status === 401) {
-      persistAuthState({
+      await persistAuthState({
         token: undefined,
         refresh_token: undefined,
         user: undefined,

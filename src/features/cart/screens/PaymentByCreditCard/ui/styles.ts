@@ -42,6 +42,12 @@ const styles = StyleSheet.create({
   selfCenter: {
     alignSelf: 'center',
   },
+  textUppercase: {
+    textTransform: 'uppercase',
+  },
+  passwordText: {
+    letterSpacing: scale(1),
+  },
 });
 
 export { styles };

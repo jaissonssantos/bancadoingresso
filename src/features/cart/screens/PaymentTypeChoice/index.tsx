@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { useCart } from 'src/redux/cartSlice';
 import type { CartStackScreenProps } from 'src/navigation/CartStack';
+import { ROUTES } from 'src/navigation/constants/routes';
 import { PaymentTypeChoiceUI } from './ui';
 
 type PaymentTypeChoiceScreenProps =
@@ -15,16 +16,16 @@ export const PaymentTypeChoiceScreen: React.FC<
   const amount = route.params.amount || 0;
 
   const handleOnMoneyPress = (): void =>
-    navigation.navigate('CartTabHome.PaymentByCash', { amount });
+    navigation.navigate(ROUTES.CartTabHome.PaymentByCash, { amount });
 
   const handleOnPixPress = (): void =>
-    navigation.navigate('CartTabHome.PaymentByPix');
+    navigation.navigate(ROUTES.CartTabHome.PaymentByPix);
 
   const handleOnDebitCardPress = (): void =>
-    navigation.navigate('CartTabHome.PaymentByDebitCard');
+    navigation.navigate(ROUTES.CartTabHome.PaymentByDebitCard);
 
   const handleOnCreditCardPress = (): void =>
-    navigation.navigate('CartTabHome.PaymentChoiceByInstallment');
+    navigation.navigate(ROUTES.Payments.PaymentChoiceByInstallment);
 
   return (
     <PaymentTypeChoiceUI

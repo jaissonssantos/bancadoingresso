@@ -1,12 +1,12 @@
 import React from 'react';
 // import { useSelector } from 'react-redux';
 // import { useCart } from 'src/redux/cartSlice';
-import type { CartStackScreenProps } from 'src/navigation/CartStack';
+import type { RootStackScreenProps } from 'src/navigation/RootStack';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
 import { PaymentChoiceByInstallmentUI } from './ui';
 
 type PaymentChoiceByInstallmentScreenProps =
-  CartStackScreenProps<'CartTabHome.PaymentChoiceByInstallment'>;
+  RootStackScreenProps<'Payments.PaymentChoiceByInstallment'>;
 
 export const PaymentChoiceByInstallmentScreen: React.FC<
   PaymentChoiceByInstallmentScreenProps
@@ -31,7 +31,7 @@ export const PaymentChoiceByInstallmentScreen: React.FC<
   ];
 
   const handleOnInstallmentPress = (value: Installment): void => {
-    navigation.navigate('CartTabHome.PaymentByCreditCard', {
+    navigation.navigate('Payments.PaymentByCreditCard', {
       installment: value,
     });
   };

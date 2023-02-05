@@ -30,8 +30,8 @@ export const ROUTES = {
     SubGroup: 'ProductsTabHome.SubGroup',
     Product: 'ProductsTabHome.Product',
   },
-  Services: {
-    NewService: 'Services.NewService',
-    NewServiceCategory: 'Services.NewServiceCategory',
+  Payments: {
+    PaymentChoiceByInstallment: 'Payments.PaymentChoiceByInstallment',
+    PaymentByCreditCard: 'Payments.PaymentByCreditCard',
   },
 } as const;
