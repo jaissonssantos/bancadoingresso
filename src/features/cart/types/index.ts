@@ -1,0 +1,5 @@
+export enum PAYMENT_TYPES {
+  TYPE_CREDITO = 1,
+  TYPE_DEBITO = 2,
+  TYPE_PIX = 5,
+}

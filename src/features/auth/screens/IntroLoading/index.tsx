@@ -18,23 +18,27 @@ export const IntroLoadingScreen: React.FC<IntroLoadingScreenProps> = ({
   navigation,
 }) => {
   const snackbar = useSnackbar();
-  const { updateAuthState } = useAuth();
+  const { updateAuthState, clearAuthState } = useAuth();
   const [message, setMessage] = useState('Carregando...');
 
   const handleAuthState = async (): Promise<void> => {
-    setMessage('Verificando autenticação...');
-    const persistedState = await retrieveAuthState();
+    try {
+      setMessage('Verificando autenticação...');
+      const persistedState = await retrieveAuthState();
 
-    // Little delay to avoid transitions bugs
-    await waitFor(100);
+      // Little delay to avoid transitions bugs
+      await waitFor(100);
 
-    if (persistedState?.token) {
-      // It'll navigate automatically
-      updateAuthState(persistedState);
-      return;
+      if (persistedState?.token) {
+        // It'll navigate automatically
+        updateAuthState(persistedState);
+        return;
+      }
+
+      navigation.replace(ROUTES.Auth.Login);
+    } catch (error) {
+      clearAuthState();
     }
-
-    navigation.replace(ROUTES.Auth.Login);
   };
 
   const handleAuthPagSeguro = async (): Promise<void> => {

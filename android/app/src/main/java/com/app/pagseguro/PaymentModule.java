@@ -23,9 +23,11 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagTransactionResult;
 import br.com.uol.pagseguro.plugpagservice.wrapper.listeners.PlugPagPaymentListener;
 
 import static com.app.pagseguro.Constants.TYPE_CREDITO;
+import static com.app.pagseguro.Constants.TYPE_PIX;
+import static com.app.pagseguro.Constants.TYPE_DEBITO;
 import static com.app.pagseguro.Constants.USER_REFERENCE;
 import static com.app.pagseguro.Constants.INSTALLMENT_TYPE_A_VISTA;
-import static com.app.pagseguro.Constants.INSTALLMENT_TYPE_PARC_VENDEDOR;
+import static com.app.pagseguro.Constants.INSTALLMENT_TYPE_PARC_COMPRADOR;
 import static com.app.pagseguro.Constants.HEAD_TEXT_COLOR;
 import static com.app.pagseguro.Constants.HEAD_BACKGROUND_COLOR;
 import static com.app.pagseguro.Constants.CONTENT_TEXT_COLOR;
@@ -64,7 +66,7 @@ public class PaymentModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startPayment(int value, int installments) {
+    public void startPayment(int value, int installments, int type) {
         Log.i(TAG, "Call startPayment");
         setStyle();
 
@@ -75,7 +77,7 @@ public class PaymentModule extends ReactContextBaseJavaModule {
             public void run() {
 
                 try {
-                    doCreditPaymentBuyerInstallments(value, installments);
+                    doCreditPaymentBuyerInstallments(value, installments, type);
 
                 } catch (Exception e) {
                     Log.i(TAG, "Error on call startPayment: " + e.getMessage());
@@ -84,15 +86,29 @@ public class PaymentModule extends ReactContextBaseJavaModule {
         }, 100);
     }
 
-    public void doCreditPaymentBuyerInstallments(int value, int installments) {
-        Log.i(TAG, "Call doCreditPaymentBuyerInstallments");
+    public void doCreditPaymentBuyerInstallments(int value, int installments, int type) {
+        int payment_type = TYPE_CREDITO;
 
-        int INSTALLMENT_FINAL = installments == 1 ? INSTALLMENT_TYPE_A_VISTA : INSTALLMENT_TYPE_PARC_VENDEDOR;
+        if(type == TYPE_CREDITO){
+            payment_type = TYPE_CREDITO;
+        }
+
+        if(type == TYPE_DEBITO){
+            payment_type = TYPE_DEBITO;
+        }
+
+        if(type == TYPE_PIX){
+            payment_type = TYPE_PIX;
+        }
+
+        int installment_type = installments == 1 ? INSTALLMENT_TYPE_A_VISTA : INSTALLMENT_TYPE_PARC_COMPRADOR;
+
+        Log.i(TAG, "Call doCreditPaymentBuyerInstallments: " + value + " installments: " + installments + " type: " + type);
 
         doPayment(new PlugPagPaymentData(
-                TYPE_CREDITO,
+                payment_type,
                 value,
-                INSTALLMENT_FINAL,
+                installment_type,
                 installments,
                 USER_REFERENCE,
                 true
@@ -190,11 +206,21 @@ public class PaymentModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onPrinterSuccess(@NonNull PlugPagPrintResult plugPagPrintResult) {
+                WritableMap params = Arguments.createMap();
+                params.putString("code", plugPagPrintResult.getErrorCode());
+                params.putString("message", "Impressão concluída");
+
+                sendEvent("eventPrintSuccess", params);
                 Log.i(TAG, "Print success");
             }
 
             @Override
             public void onPrinterError(@NonNull PlugPagPrintResult plugPagPrintResult) {
+                WritableMap params = Arguments.createMap();
+                params.putString("code", plugPagPrintResult.getErrorCode());
+                params.putString("message", plugPagPrintResult.getMessage());
+
+                sendEvent("eventPrintError", params);
                 Log.i(TAG, "Print error");
             }
         });

@@ -86,7 +86,9 @@ export const PaymentChoiceByInstallmentUI: React.FC<
     <FlatList
       contentContainerStyle={styles.container}
       data={installments}
-      keyExtractor={(item): string => item.value.toString()}
+      keyExtractor={(item): string =>
+        `${item.quantity.toString()} - ${item.value.toString()}`
+      }
       renderItem={({ item }): ReactElement => <RenderInstallment item={item} />}
       ItemSeparatorComponent={(): ReactElement => (
         <View style={styles.separator} />

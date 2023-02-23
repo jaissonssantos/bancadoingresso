@@ -10,12 +10,16 @@ import {
   startPayment,
   abortPayment,
 } from 'src/core/native_modules/payment';
+import { useSnackbar } from 'src/hooks/useSnackbar';
+import { PAYMENT_TYPES } from 'src/features/cart/types';
 import {
   States,
   PaymentByCreditCardUI,
   PaymentByCreditCardEventListener,
   PinCodePinRequestedEventListener,
   AbortPaymentEventListener,
+  PrintSuccessEventListener,
+  PrintErrorEventListener,
 } from './ui';
 import { ROUTES } from 'src/navigation/constants/routes';
 
@@ -32,6 +36,7 @@ export const PaymentByCreditCardScreen: React.FC<
     )}`,
   );
 
+  const snackbar = useSnackbar();
   const cart = useSelector(useCart);
   const [state, setState] = useState(States.awaiting_credit_card);
 
@@ -44,49 +49,48 @@ export const PaymentByCreditCardScreen: React.FC<
   const dispatch = useDispatch();
   const eventEmitter = new NativeEventEmitter(PaymentModule);
 
-  const handleOnInitialState = (): void => {
-    setState(States.awaiting_credit_card);
-    setStatusPayment('AGUARDE...');
-    setErrorPayment(null);
-    setCodePin(null);
-  };
-
   const handleOnStartPayment = async (): Promise<void> => {
-    handleOnInitialState();
     const response = await startPayment(
       installmentFromNavigation.value * 100,
       installmentFromNavigation.quantity,
+      PAYMENT_TYPES.TYPE_CREDITO,
     );
 
     log.i(`Response do payment: ${JSON.stringify(response || {})}`);
   };
 
-  // const handleOnContinue = (): void => {
-  //   setState(States.loading);
-  //   setVisible(true);
+  const handleOnRetryPayment = (): void => {
+    setState(States.awaiting_credit_card);
+    setStatusPayment('AGUARDE...');
+    setErrorPayment(null);
+    setCodePin(null);
 
-  //   // new Promise(resolve => setTimeout(resolve, 3000)).then(() => {
-  //   //   setState(States.success);
-  //   // });
-  // };
+    handleOnStartPayment();
+  };
+
+  const handleOnGoToPaymentTypeChoice = (): void => {
+    // call on action to decrement the quantity and value of the item
+    navigation.popToTop();
+  };
 
   const handleOnGoToHome = (): void => {
-    navigation.navigate(ROUTES.MainTab.Itself, {
-      screen: ROUTES.MainTab.Home,
+    dispatch(removeAllItemFromCart());
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: ROUTES.MainTab.Itself }],
     });
   };
 
   const handleOnCancel = (): void => {
     abortPayment();
-    // navigation.navigate('CartTabHome.itself');
-    // dispatch(removeAllItemFromCart());
   };
 
-  useEffect(() => {
-    new Promise(resolve => setTimeout(resolve, 500)).then(async () => {
-      handleOnStartPayment();
-    });
-  }, []);
+  // useEffect(() => {
+  //   new Promise(resolve => setTimeout(resolve, 500)).then(async () => {
+  //     handleOnStartPayment();
+  //   });
+  // }, []);
 
   useEffect(() => {
     if (state === States.finished) {
@@ -173,6 +177,26 @@ export const PaymentByCreditCardScreen: React.FC<
       },
     );
 
+    const eventCodePrintSuccessListener = eventEmitter.addListener(
+      'eventPrintSuccess',
+      ({ message }: PrintSuccessEventListener): void => {
+        snackbar.show({
+          message,
+          type: 'success',
+        });
+      },
+    );
+
+    const eventCodePrintErrorListener = eventEmitter.addListener(
+      'eventPrintError',
+      ({ message }: PrintErrorEventListener): void => {
+        snackbar.show({
+          message,
+          type: 'danger',
+        });
+      },
+    );
+
     return (): void => {
       eventEmitter.removeAllListeners('eventStatusPayment');
       eventEmitter.removeAllListeners('eventSuccessPayment');
@@ -180,12 +204,16 @@ export const PaymentByCreditCardScreen: React.FC<
       eventEmitter.removeAllListeners('eventPasswordToPayment');
       eventEmitter.removeAllListeners('eventCodePinRequested');
       eventEmitter.removeAllListeners('eventCodeAvailableAbort');
+      eventEmitter.removeAllListeners('eventPrintSuccess');
+      eventEmitter.removeAllListeners('eventPrintError');
       eventPaymentStatusListener.remove();
       eventPaymentSuccessListener.remove();
       eventPaymentErrorListener.remove();
       eventPasswordToListener.remove();
       eventCodePinRequestedListener.remove();
       eventCodeAvailableListener.remove();
+      eventCodePrintSuccessListener.remove();
+      eventCodePrintErrorListener.remove();
     };
   }, []);
 
@@ -206,9 +234,10 @@ export const PaymentByCreditCardScreen: React.FC<
       errorPayment={errorPayment}
       codePin={codePin}
       isAvailableAbort={isAvailableAbort}
-      onRetryPayment={handleOnStartPayment}
+      onRetryPayment={handleOnRetryPayment}
       onGoToHome={handleOnGoToHome}
       onCancel={handleOnCancel}
+      onGoToPaymentTypeChoice={handleOnGoToPaymentTypeChoice}
     />
   );
 };

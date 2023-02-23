@@ -49,7 +49,7 @@ export const MainTab: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
         active={isRouteActive(ROUTES.MainTab.Cart)}
         onPress={onNavigateToRoute(ROUTES.MainTab.Cart)}
       />
-      <MainTabItem
+      {/* <MainTabItem
         label="Relatórios"
         Icon={NoteIcon}
         active={isRouteActive(ROUTES.MainTab.ScheduleHome)}
@@ -60,7 +60,7 @@ export const MainTab: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
         Icon={GearIcon}
         active={isRouteActive(ROUTES.MainTab.ScheduleHome)}
         onPress={onNavigateToRoute(ROUTES.MainTab.ScheduleHome)}
-      />
+      /> */}
     </View>
   );
 };

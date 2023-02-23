@@ -32,6 +32,7 @@ interface PaymentByCreditCardUIProps {
   onRetryPayment: () => void;
   onGoToHome: () => void;
   onCancel: () => void;
+  onGoToPaymentTypeChoice: () => void;
 }
 
 export interface PaymentByCreditCardEventListener {
@@ -47,6 +48,12 @@ export interface AbortPaymentEventListener {
   isAvailableAbort: boolean;
 }
 
+export interface PrintSuccessEventListener
+  extends PaymentByCreditCardEventListener {}
+
+export interface PrintErrorEventListener
+  extends PaymentByCreditCardEventListener {}
+
 export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
   state,
   cart,
@@ -58,6 +65,7 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
   onRetryPayment,
   onGoToHome,
   onCancel,
+  onGoToPaymentTypeChoice,
 }) => {
   const nfcIcon = <NFCIcon size={IconSizes.medium} fill={Colors.white} />;
   const errorIcon = (
@@ -86,6 +94,12 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
           type={ButtonType.secondary}
           onPress={onGoToHome}
           title="Voltar para o início"
+        />
+
+        <Button
+          type={ButtonType.primary}
+          onPress={onGoToPaymentTypeChoice}
+          title="Voltar para concluir a venda"
         />
       </View>
     </React.Fragment>

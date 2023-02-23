@@ -7,7 +7,8 @@ export interface AuthContextValue extends AuthState {
 }
 
 export const AuthContext = createContext<AuthContextValue>({
-  accessToken: '',
+  token: '',
+  refresh_token: '',
   updateAuthState: () => undefined,
   clearAuthState: () => undefined,
 });
