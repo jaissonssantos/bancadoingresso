@@ -1,34 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { NativeEventEmitter } from 'react-native';
 // import { useSelector } from 'react-redux';
 // import { useCart } from 'src/redux/cartSlice';
 import type { RootStackScreenProps } from 'src/navigation/RootStack';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
-import { PaymentChoiceByInstallmentUI } from './ui';
+import {
+  getAvailableInstallments,
+  PaymentModule,
+} from 'src/core/native_modules/payment';
+import { formatInstallments } from 'src/features/cart/utils';
+import {
+  PaymentChoiceByInstallmentUI,
+  EventCodeGetAvailableInstallmentsListener,
+  States,
+} from './ui';
 
 type PaymentChoiceByInstallmentScreenProps =
   RootStackScreenProps<'Payments.PaymentChoiceByInstallment'>;
 
 export const PaymentChoiceByInstallmentScreen: React.FC<
   PaymentChoiceByInstallmentScreenProps
-> = ({ navigation }) => {
-  // const cart = useSelector(useCart);
-  const installments: Installment[] = [
-    {
-      quantity: 1,
-      value: 1000,
-      isInterest: false,
-    },
-    {
-      quantity: 2,
-      value: 500,
-      isInterest: false,
-    },
-    {
-      quantity: 3,
-      value: 130,
-      isInterest: true,
-    },
-  ];
+> = ({ navigation, route }) => {
+  const eventEmitter = new NativeEventEmitter(PaymentModule);
+
+  const amount = route.params.amount || 0;
+
+  const [state, setState] = React.useState<States>(States.loading);
+  const [installments, setInstallments] = React.useState<Installment[]>([]);
 
   const handleOnInstallmentPress = (value: Installment): void => {
     navigation.navigate('Payments.PaymentByCreditCard', {
@@ -36,8 +34,41 @@ export const PaymentChoiceByInstallmentScreen: React.FC<
     });
   };
 
+  const handleOnFetchInstallments = (): void => {
+    new Promise(resolve => setTimeout(resolve, 100)).then(() => {
+      getAvailableInstallments(amount);
+    });
+  };
+
+  useEffect(() => {
+    handleOnFetchInstallments();
+  }, []);
+
+  useEffect(() => {
+    const eventCodeGetAvailableInstallmentsListener = eventEmitter.addListener(
+      'eventCodeGetAvailableInstallments',
+      ({
+        installments: installmentsData,
+      }: EventCodeGetAvailableInstallmentsListener): void => {
+        const data: number[] = JSON.parse(installmentsData);
+
+        if (data.length > 0) {
+          setInstallments(formatInstallments(data));
+
+          setState(States.default);
+        }
+      },
+    );
+
+    return (): void => {
+      eventCodeGetAvailableInstallmentsListener.remove();
+      eventEmitter.removeAllListeners('eventCodeGetAvailableInstallments');
+    };
+  }, []);
+
   return (
     <PaymentChoiceByInstallmentUI
+      state={state}
       installments={installments}
       onInstallmentPress={handleOnInstallmentPress}
     />

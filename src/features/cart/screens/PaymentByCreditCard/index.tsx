@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NativeEventEmitter } from 'react-native';
+import { useBackHandler } from '@react-native-community/hooks';
 import { log } from 'src/util/log';
 import { useCart, removeAllItemFromCart } from 'src/redux/cartSlice';
 import type { RootStackScreenProps } from 'src/navigation/RootStack';
-import { PaymentModule, startPayment } from 'src/core/native_modules/payment';
-import { IEventCode, IEventMessage } from '../../types';
 import {
+  PaymentModule,
+  startPayment,
+  abortPayment,
+} from 'src/core/native_modules/payment';
+import {
+  States,
   PaymentByCreditCardUI,
   PaymentByCreditCardEventListener,
-  States,
+  PinCodePinRequestedEventListener,
+  AbortPaymentEventListener,
 } from './ui';
+import { ROUTES } from 'src/navigation/constants/routes';
 
 type PaymentByCreditCardScreenProps =
   RootStackScreenProps<'Payments.PaymentByCreditCard'>;
@@ -19,6 +26,11 @@ export const PaymentByCreditCardScreen: React.FC<
   PaymentByCreditCardScreenProps
 > = ({ navigation, route }) => {
   const installmentFromNavigation = route.params.installment;
+  log.i(
+    `installmentFromNavigation >>> ${JSON.stringify(
+      installmentFromNavigation,
+    )}`,
+  );
 
   const cart = useSelector(useCart);
   const [state, setState] = useState(States.awaiting_credit_card);
@@ -26,13 +38,28 @@ export const PaymentByCreditCardScreen: React.FC<
   const [statusPayment, setStatusPayment] = useState<string | null>(
     'AGUARDE...',
   );
-  const [successPayment, setSuccessPayment] = useState<string | null>(null);
+  const [isAvailableAbort, setIsAvailableAbort] = useState(false);
   const [errorPayment, setErrorPayment] = useState<string | null>(null);
-  const [passwordToPayment, setPasswordToPayment] = useState<string | null>(
-    null,
-  );
+  const [codePin, setCodePin] = useState<string | null>(null);
   const dispatch = useDispatch();
   const eventEmitter = new NativeEventEmitter(PaymentModule);
+
+  const handleOnInitialState = (): void => {
+    setState(States.awaiting_credit_card);
+    setStatusPayment('AGUARDE...');
+    setErrorPayment(null);
+    setCodePin(null);
+  };
+
+  const handleOnStartPayment = async (): Promise<void> => {
+    handleOnInitialState();
+    const response = await startPayment(
+      installmentFromNavigation.value * 100,
+      installmentFromNavigation.quantity,
+    );
+
+    log.i(`Response do payment: ${JSON.stringify(response || {})}`);
+  };
 
   // const handleOnContinue = (): void => {
   //   setState(States.loading);
@@ -43,31 +70,31 @@ export const PaymentByCreditCardScreen: React.FC<
   //   // });
   // };
 
-  const handleOnCancel = (): void => {
-    // navigation.navigate('CartTabHome.itself');
-    dispatch(removeAllItemFromCart());
+  const handleOnGoToHome = (): void => {
+    navigation.navigate(ROUTES.MainTab.Itself, {
+      screen: ROUTES.MainTab.Home,
+    });
   };
 
-  // useEffect(() => {
-  // if (state === States.success) {
-  // new Promise(resolve => setTimeout(resolve, 3000)).then(() => {
-  //   setVisible(false);
-  //   setState(States.finished);
-  // });
-  // }
-  // }, [state]);
+  const handleOnCancel = (): void => {
+    abortPayment();
+    // navigation.navigate('CartTabHome.itself');
+    // dispatch(removeAllItemFromCart());
+  };
 
   useEffect(() => {
     new Promise(resolve => setTimeout(resolve, 500)).then(async () => {
-      const response = await startPayment(1000, 1);
-
-      log.i(`Response do payment: ${JSON.stringify(response || {})}`);
+      handleOnStartPayment();
     });
-    // startPayment();
-    // new Promise(resolve => setTimeout(resolve, 2000)).then(() => {
-    //   setState(States.password);
-    // });
   }, []);
+
+  useEffect(() => {
+    if (state === States.finished) {
+      navigation.setOptions({
+        headerShown: false,
+      });
+    }
+  }, [state]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -81,87 +108,94 @@ export const PaymentByCreditCardScreen: React.FC<
 
   useEffect(() => {
     const eventPaymentStatusListener = eventEmitter.addListener(
-      'statusPayment',
+      'eventStatusPayment',
       ({ code, message }: PaymentByCreditCardEventListener): void => {
-        if (code) {
-          log.i(
-            `Status da operação: ${JSON.stringify({ code, message } || {})}`,
-          );
-          if (
-            (code === IEventCode.EVENT_CODE_CUSTOM_MESSAGE &&
-              message === IEventMessage.EVENT_PASSWORD_LOCKED) ||
-            code === IEventCode.EVENT_CODE_INSERTED_CARD
-          ) {
-            new Promise(resolve => setTimeout(resolve, 700)).then(() => {
-              setState(States.requires_password);
-            });
-          }
-
-          if (
-            code === IEventCode.EVENT_CODE_CUSTOM_MESSAGE &&
-            message === IEventMessage.EVENT_UPDATING_TABLES
-          ) {
-            setState(States.updating_tables);
-          }
-
-          if (code === IEventCode.EVENT_CODE_WAITING_CARD) {
-            setState(States.awaiting_credit_card);
-          }
-
-          if (
-            code === IEventCode.EVENT_CODE_PIN_OK ||
-            code === IEventCode.EVENT_CODE_AUTHORIZING
-          ) {
-            setState(States.processing);
-          }
-
+        if (message) {
           setStatusPayment(message);
+
+          if (code === null) {
+            setState(States.generic_error);
+          }
         }
       },
     );
 
     const eventPaymentSuccessListener = eventEmitter.addListener(
-      'successPayment',
-      (data: PaymentByCreditCardEventListener): void => {
-        if (data.code) {
-          // log.i(`Status da operação: ${JSON.stringify(data || {})}`);
-          setPasswordToPayment(null);
-          setSuccessPayment(data.message);
+      'eventSuccessPayment',
+      ({ code, message }: PaymentByCreditCardEventListener): void => {
+        log.i(`Success do payment: ${code} | ${message}`);
+
+        if (code) {
+          setCodePin(null);
+          setIsAvailableAbort(false);
+          setState(States.finished);
         }
       },
     );
 
     const eventPaymentErrorListener = eventEmitter.addListener(
-      'errorPayment',
-      (data: PaymentByCreditCardEventListener): void => {
-        if (data.code) {
-          setPasswordToPayment(null);
-          setState(States.error);
-          setErrorPayment(data.message);
+      'eventErrorPayment',
+      ({ code, message }: PaymentByCreditCardEventListener): void => {
+        if (code === null) {
+          setState(States.generic_error);
         }
+
+        setCodePin(null);
+        setIsAvailableAbort(false);
+        setErrorPayment(message);
       },
     );
 
     const eventPasswordToListener = eventEmitter.addListener(
-      'passwordToPayment',
-      (data: PaymentByCreditCardEventListener): void => {
-        if (data.code) {
-          setPasswordToPayment(data.message);
+      'eventPasswordToPayment',
+      ({ code, message }: PaymentByCreditCardEventListener): void => {
+        if (code) {
+          setCodePin(message);
         }
       },
     );
 
+    const eventCodePinRequestedListener = eventEmitter.addListener(
+      'eventCodePinRequested',
+      ({ isPinRequested }: PinCodePinRequestedEventListener): void => {
+        if (isPinRequested) {
+          setState(States.requires_code_pin);
+        } else {
+          setState(States.processing);
+        }
+      },
+    );
+
+    const eventCodeAvailableListener = eventEmitter.addListener(
+      'eventCodeAvailableAbort',
+      ({ isAvailableAbort: isAbort }: AbortPaymentEventListener): void => {
+        setIsAvailableAbort(isAbort);
+      },
+    );
+
     return (): void => {
-      eventEmitter.removeAllListeners('statusPayment');
-      eventEmitter.removeAllListeners('successPayment');
-      eventEmitter.removeAllListeners('errorPayment');
-      eventEmitter.removeAllListeners('passwordToPayment');
+      eventEmitter.removeAllListeners('eventStatusPayment');
+      eventEmitter.removeAllListeners('eventSuccessPayment');
+      eventEmitter.removeAllListeners('eventErrorPayment');
+      eventEmitter.removeAllListeners('eventPasswordToPayment');
+      eventEmitter.removeAllListeners('eventCodePinRequested');
+      eventEmitter.removeAllListeners('eventCodeAvailableAbort');
       eventPaymentStatusListener.remove();
       eventPaymentSuccessListener.remove();
       eventPaymentErrorListener.remove();
       eventPasswordToListener.remove();
+      eventCodePinRequestedListener.remove();
+      eventCodeAvailableListener.remove();
     };
   }, []);
+
+  useBackHandler(() => {
+    if (isAvailableAbort) {
+      handleOnCancel();
+    }
+
+    return true;
+  });
 
   return (
     <PaymentByCreditCardUI
@@ -169,9 +203,11 @@ export const PaymentByCreditCardScreen: React.FC<
       cart={cart}
       installment={installmentFromNavigation}
       statusPayment={statusPayment}
-      successPayment={successPayment}
       errorPayment={errorPayment}
-      passwordToPayment={passwordToPayment}
+      codePin={codePin}
+      isAvailableAbort={isAvailableAbort}
+      onRetryPayment={handleOnStartPayment}
+      onGoToHome={handleOnGoToHome}
       onCancel={handleOnCancel}
     />
   );

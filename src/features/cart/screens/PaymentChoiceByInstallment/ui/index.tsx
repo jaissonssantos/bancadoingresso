@@ -3,19 +3,30 @@ import { FlatList, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PressableOpacity } from 'src/components/PressableOpacity';
 import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
+import { Skeleton } from 'src/components/Skeleton';
 // import type { ICartState } from 'src/redux/cartSlice';
 import { toString } from 'src/util/currency';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
 import { styles } from './styles';
 
-interface PaymentChoiceByInstallmentUIProps {
+export enum States {
+  loading = 'loading',
+  default = 'default',
+}
+
+export interface EventCodeGetAvailableInstallmentsListener {
+  installments: string;
+}
+
+export interface PaymentChoiceByInstallmentUIProps {
+  state: States;
   installments: Installment[];
   onInstallmentPress: (value: Installment) => void;
 }
 
 export const PaymentChoiceByInstallmentUI: React.FC<
   PaymentChoiceByInstallmentUIProps
-> = ({ installments, onInstallmentPress }) => {
+> = ({ state, installments, onInstallmentPress }) => {
   const RenderInstallment = ({ item }: { item: Installment }): ReactElement => {
     return (
       <PressableOpacity
@@ -59,6 +70,33 @@ export const PaymentChoiceByInstallmentUI: React.FC<
     );
   };
 
+  const renderLoading: ReactElement = (
+    <View style={[styles.container, styles.spacingTop]}>
+      {Array.from({ length: 10 }).map(_ => (
+        <React.Fragment>
+          <Skeleton style={styles.item} />
+
+          <View style={styles.separator} />
+        </React.Fragment>
+      ))}
+    </View>
+  );
+
+  const renderDefault: ReactElement = (
+    <FlatList
+      contentContainerStyle={styles.container}
+      data={installments}
+      keyExtractor={(item): string => item.value.toString()}
+      renderItem={({ item }): ReactElement => <RenderInstallment item={item} />}
+      ItemSeparatorComponent={(): ReactElement => (
+        <View style={styles.separator} />
+      )}
+      ListFooterComponent={(): ReactElement => (
+        <View style={styles.spacingBottom} />
+      )}
+    />
+  );
+
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
       <View style={styles.contentTitle}>
@@ -85,17 +123,12 @@ export const PaymentChoiceByInstallmentUI: React.FC<
         </Text>
       </View>
 
-      <FlatList
-        contentContainerStyle={[styles.container, styles.flex1]}
-        data={installments}
-        keyExtractor={(item): string => item.quantity.toString()}
-        renderItem={({ item }): ReactElement => (
-          <RenderInstallment item={item} />
-        )}
-        ItemSeparatorComponent={(): ReactElement => (
-          <View style={styles.separator} />
-        )}
-      />
+      {
+        {
+          [States.loading]: renderLoading,
+          [States.default]: renderDefault,
+        }[state]
+      }
     </SafeAreaView>
   );
 };

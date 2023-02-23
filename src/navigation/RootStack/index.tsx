@@ -23,6 +23,10 @@ interface PaymentByCreditCardStack {
   installment: Installment;
 }
 
+interface PaymentChoiceByInstallmentAmountStack {
+  amount: number;
+}
+
 const {
   Auth: AUTH_ROUTES,
   Payments: PAYMENTS_ROUTES,
@@ -33,7 +37,7 @@ export type RootStackParamList = {
   [AUTH_ROUTES.IntroLoading]: undefined;
   [AUTH_ROUTES.Login]: undefined;
   [MAIN_TAB_ROUTES.Itself]: NavigatorScreenParams<MainTabParamList> | undefined;
-  [PAYMENTS_ROUTES.PaymentChoiceByInstallment]: undefined;
+  [PAYMENTS_ROUTES.PaymentChoiceByInstallment]: PaymentChoiceByInstallmentAmountStack;
   [PAYMENTS_ROUTES.PaymentByCreditCard]: PaymentByCreditCardStack;
 };
 

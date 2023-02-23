@@ -14,6 +14,7 @@ const stylesSecondary = StyleSheet.create({
   },
   text: {
     marginHorizontal: scale(10),
+    color: Colors.black,
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,

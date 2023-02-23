@@ -30,6 +30,7 @@ import CheckSvg from './svgs/check.svg';
 import ReloadSvg from './svgs/reload.svg';
 import ChangeSvg from './svgs/change.svg';
 import NFCSvg from './svgs/nfc.svg';
+import ErrorSvg from './svgs/error.svg';
 import ImagePlaceholderSvg from './svgs/image-placeholder.svg';
 import { svgIconSizeHoc } from './svgs/svgIconSizeHoc';
 
@@ -64,6 +65,7 @@ const CheckIcon = svgIconSizeHoc(CheckSvg);
 const ReloadIcon = svgIconSizeHoc(ReloadSvg);
 const ChangeIcon = svgIconSizeHoc(ChangeSvg);
 const NFCIcon = svgIconSizeHoc(NFCSvg);
+const ErrorIcon = svgIconSizeHoc(ErrorSvg);
 const ImagePlaceholderIcon = svgIconSizeHoc(ImagePlaceholderSvg);
 
 export {
@@ -98,6 +100,7 @@ export {
   ReloadIcon,
   ChangeIcon,
   NFCIcon,
+  ErrorIcon,
   ImagePlaceholderIcon,
   svgIconSizeHoc,
   IconSizes,

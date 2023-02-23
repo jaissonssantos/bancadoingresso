@@ -1,5 +1,6 @@
 package com.app.pagseguro;
 
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,9 @@ public class AuthenticationModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void isAuthenticated(Promise promise) {
+        Log.i(TAG, "serial number: " + String.valueOf(Build.SERIAL));
+        // enviar um event para adicionar no storage do lado RN
+
         promise.resolve(mPlugPag.isAuthenticated());
     };
 

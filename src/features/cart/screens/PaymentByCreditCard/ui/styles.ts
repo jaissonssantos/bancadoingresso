@@ -13,18 +13,25 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: PADDING_HORIZONTAL,
   },
+  alignCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   bold: {
     fontWeight: 'bold',
   },
   flex1: {
     flex: 1,
   },
+  flexGrow: {
+    flexGrow: 1,
+  },
   spacingTop: {
     marginTop: verticalScale(10),
   },
   spacingContainer: {
     paddingHorizontal: PADDING_HORIZONTAL,
-    marginBottom: verticalScale(4),
+    marginBottom: verticalScale(20),
   },
   spacingBottom: {
     marginBottom: verticalScale(12),

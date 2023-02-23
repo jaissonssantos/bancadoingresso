@@ -19,8 +19,6 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addItemToCart(state, { payload }: PayloadAction<IProduct>) {
-      console.log('payload >>> ', payload);
-
       const existingItem = state.items.find(
         item =>
           item.id === payload.id &&
@@ -28,29 +26,30 @@ const cartSlice = createSlice({
           item.isHalfPrice === payload.isHalfPrice,
       );
 
-      console.log('existingItem >>>', existingItem);
+      const value = payload?.unitValue ?? payload?.value ?? 0;
+      const newValue = Number(parseFloat(String(value)).toFixed(2));
 
       state.totalQuantity++;
-      state.totalAmount += payload?.value ?? 0;
+      state.totalAmount += newValue ?? 0;
 
       if (!existingItem) {
         state.items.push({
           id: payload.id,
           name: payload.name,
           count: payload.count,
-          value: payload.value,
+          value: newValue ?? 0,
+          unitValue: newValue ?? 0,
           isHalfPrice: payload.isHalfPrice ?? false,
           quantity: 1,
-          totalPrice: payload.value,
+          totalPrice: newValue ?? 0,
           payment: payload.payment,
         });
       } else {
         const quantity = existingItem?.quantity ?? 1;
         const totalPrice = existingItem?.totalPrice ?? 0;
-        const value = payload?.value ?? 0;
 
         existingItem.quantity = quantity + 1;
-        existingItem.totalPrice = totalPrice + value;
+        existingItem.totalPrice = totalPrice + newValue;
       }
     },
     removeItemFromCart(state, { payload }: PayloadAction<IProduct>) {
@@ -61,9 +60,12 @@ const cartSlice = createSlice({
           item.isHalfPrice === payload.isHalfPrice,
       );
 
+      const value = payload?.unitValue ?? payload?.value ?? 0;
+      const newValue = Number(parseFloat(String(value)).toFixed(2));
+
       if (existingItem) {
         state.totalQuantity--;
-        state.totalAmount -= payload.value;
+        state.totalAmount -= newValue;
 
         if (payload.quantity === 1) {
           state.items = state.items.filter(
@@ -74,7 +76,7 @@ const cartSlice = createSlice({
           );
         } else {
           existingItem.quantity--;
-          existingItem.totalPrice -= existingItem.value;
+          existingItem.totalPrice -= newValue;
         }
       }
     },

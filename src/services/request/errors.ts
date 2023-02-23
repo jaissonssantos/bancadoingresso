@@ -25,7 +25,9 @@ export const getErrorMessage = (error: unknown): string => {
   }
 
   if (isNetworkError(error)) {
-    return 'Sem conexão à internet. Confira sua conexão e tente novamente!';
+    return `Sem conexão à internet. Confira sua conexão e tente novamente!: ${JSON.stringify(
+      error || {},
+    )}`;
   }
 
   return 'Deu um probleminha técnico aqui, nada grave. Tente de novo em alguns instantes!';

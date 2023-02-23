@@ -25,6 +25,7 @@ export interface ITickets {
   id: string;
   name: string;
   value: number;
+  unitValue?: number;
   count: number;
   isHalfPrice: boolean;
   quantity: number;

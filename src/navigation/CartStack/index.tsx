@@ -30,7 +30,6 @@ export type CartTabHomeParamList = {
   [CART_TAB_HOME_ROUTES.PaymentByCash]: CartStackAmount;
   [CART_TAB_HOME_ROUTES.PaymentByPix]: undefined;
   [CART_TAB_HOME_ROUTES.PaymentByDebitCard]: undefined;
-  [CART_TAB_HOME_ROUTES.PaymentChoiceByInstallment]: undefined;
 };
 
 export type CartStackScreenProps<T extends keyof CartTabHomeParamList> =

@@ -47,8 +47,8 @@ public class Constants {
     public static final String BEEP_FAIL = "Não foi possível realizar o beep";
 
     //PlugPagStyle Constants
-    public static final int HEAD_TEXT_COLOR = 0xffffffff;
-    public static final int HEAD_BACKGROUND_COLOR = 0xff1ec390;
+    public static final int HEAD_TEXT_COLOR = 0xff002000;
+    public static final int HEAD_BACKGROUND_COLOR = 0xffffffff;
     public static final int CONTENT_TEXT_COLOR = 0xff202020;
     public static final int CONTENT_TEXT_VALUE_1_COLOR = 0xff002000;
     public static final int CONTENT_TEXT_VALUE_2_COLOR = 0xfff00000;
@@ -57,5 +57,4 @@ public class Constants {
     public static final int NEGATIVE_BUTTON_TEXT_COLOR = 0xff888888;
     public static final int NEGATIVE_BUTTON_BACKGROUND = 0x00ffffff;
     public static final int LINE_COLOR = 0xff000000;
-
 }

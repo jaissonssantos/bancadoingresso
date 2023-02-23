@@ -6,13 +6,14 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios --simulator=\"iPhone 14 Pro\"",
     "start": "react-native start --reset-cache",
-    "android:build-release": "yarn && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output --assets-dest android/app/src/main/res/ && cd android/ && ENVFILE=.env ./gradlew assembleRelease",
+    "android:build-release": "yarn && cd android/ && ENVFILE=.env ./gradlew assembleRelease",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^4.4.5",
     "@react-native-async-storage/async-storage": "^1.17.10",
+    "@react-native-community/hooks": "^3.0.0",
     "@react-navigation/bottom-tabs": "^6.4.0",
     "@react-navigation/native": "^6.0.12",
     "@react-navigation/native-stack": "^6.8.0",

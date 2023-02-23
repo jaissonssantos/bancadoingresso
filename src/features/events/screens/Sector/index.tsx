@@ -70,7 +70,7 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
         totalPrice: 0,
         isHalfPrice: ticket.isHalfPrice,
         count: ticket.count,
-        value: ticket.value,
+        value: ticket.value ?? ticket.unitValue,
         price: ticket.value,
       }));
 

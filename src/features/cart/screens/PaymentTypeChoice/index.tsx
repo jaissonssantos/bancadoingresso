@@ -25,12 +25,12 @@ export const PaymentTypeChoiceScreen: React.FC<
     navigation.navigate(ROUTES.CartTabHome.PaymentByDebitCard);
 
   const handleOnCreditCardPress = (): void =>
-    navigation.navigate(ROUTES.Payments.PaymentChoiceByInstallment);
+    navigation.navigate(ROUTES.Payments.PaymentChoiceByInstallment, { amount });
 
   return (
     <PaymentTypeChoiceUI
       cart={cart}
-      amount={amount}
+      amount={amount / 100}
       onMoneyPress={handleOnMoneyPress}
       onPixPress={handleOnPixPress}
       onDebitCardPress={handleOnDebitCardPress}

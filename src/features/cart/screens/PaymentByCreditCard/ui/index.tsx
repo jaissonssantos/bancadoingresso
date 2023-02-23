@@ -2,20 +2,21 @@ import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
-import { SuccessIcon, IconSizes, NFCIcon } from 'src/assets/icons';
+import { SuccessIcon, IconSizes, NFCIcon, ErrorIcon } from 'src/assets/icons';
 import type { ICartState } from 'src/redux/cartSlice';
 import { toString } from 'src/util/currency';
 import { Colors } from 'src/styleguide/colors';
+import { Button, ButtonType } from 'src/components/Button';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
-import { log } from 'src/util/log';
 import { styles } from './styles';
 
 export enum States {
   awaiting_credit_card = 'awaiting_credit_card',
   updating_tables = 'updating_tables',
   processing = 'processing',
-  requires_password = 'requires_password',
+  requires_code_pin = 'requires_code_pin',
   error = 'error',
+  generic_error = 'generic_error',
   cancelled = 'cancelled',
   finished = 'finished',
 }
@@ -25,15 +26,25 @@ interface PaymentByCreditCardUIProps {
   cart: ICartState;
   installment: Installment;
   statusPayment: string | null;
-  successPayment: string | null;
   errorPayment: string | null;
-  passwordToPayment: string | null;
+  codePin: string | null;
+  isAvailableAbort: boolean;
+  onRetryPayment: () => void;
+  onGoToHome: () => void;
   onCancel: () => void;
 }
 
 export interface PaymentByCreditCardEventListener {
+  code: number | null;
   message: string;
-  code: string;
+}
+
+export interface PinCodePinRequestedEventListener {
+  isPinRequested: boolean;
+}
+
+export interface AbortPaymentEventListener {
+  isAvailableAbort: boolean;
 }
 
 export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
@@ -41,51 +52,49 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
   cart,
   installment,
   statusPayment,
-  successPayment,
   errorPayment,
-  passwordToPayment,
-  // onCancel,
+  codePin,
+  isAvailableAbort,
+  onRetryPayment,
+  onGoToHome,
+  onCancel,
 }) => {
   const nfcIcon = <NFCIcon size={IconSizes.medium} fill={Colors.white} />;
-  const successIcon = (
-    <SuccessIcon size={IconSizes.xxmedium} fill={Colors.white} />
+  const errorIcon = (
+    <ErrorIcon size={IconSizes.medium} fill={Colors.errorRed} />
   );
   const processingIcon = (
     <ActivityIndicator size="large" color={Colors.white} />
   );
-  // const renderLoading = (): ReactElement => (
-  //   <React.Fragment>
-  //     <ActivityIndicator size="large" color={Colors.white} />
-  //     <Text
-  //       size={TextSizes.medium}
-  //       weight={TextWeights.bold}
-  //       style={[styles.bold, styles.spacingTop]}>
-  //       Processando
-  //     </Text>
-  //   </React.Fragment>
-  // );
 
-  // const renderSuccess = (): ReactElement => (
-  //   <React.Fragment>
-  //     <SuccessIcon size={IconSizes.xxmedium} fill={Colors.white} />
-  //     <Text
-  //       size={TextSizes.medium}
-  //       weight={TextWeights.bold}
-  //       style={[styles.bold, styles.spacingTop]}>
-  //       Pagamento realizado
-  //     </Text>
-  //   </React.Fragment>
-  // );
+  const renderSuccess = (
+    <React.Fragment>
+      <View style={[styles.container, styles.alignCenter]}>
+        <View style={styles.spacingBottom}>
+          <SuccessIcon size={IconSizes.large} fill={Colors.white} />
+        </View>
+        <Text
+          size={TextSizes.medium}
+          weight={TextWeights.bold}
+          align={TextAligns.center}
+          style={[styles.bold, styles.spacingTop]}>
+          Venda realizada com sucesso
+        </Text>
+      </View>
+      <View style={[styles.spacingContainer]}>
+        <Button
+          type={ButtonType.secondary}
+          onPress={onGoToHome}
+          title="Voltar para o início"
+        />
+      </View>
+    </React.Fragment>
+  );
 
-  // log.i('statusPayment >>>', statusPayment as string);
-  log.i('successPayment >>>', successPayment as string);
-  log.i('errorPayment >>>', errorPayment as string);
-  // log.i('passwordToPayment >>>', passwordToPayment as string);
-
-  return (
-    <SafeAreaView edges={['top']} style={styles.safeArea}>
+  const renderDefault = (
+    <React.Fragment>
       <View style={[styles.container, styles.flex1]}>
-        {state === States.requires_password && (
+        {state === States.requires_code_pin && (
           <React.Fragment>
             <Text
               size={TextSizes.medium}
@@ -100,12 +109,12 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
               weight={TextWeights.bold}
               align={TextAligns.center}
               style={[styles.passwordText, styles.spacingBottom]}>
-              {passwordToPayment}
+              {codePin}
             </Text>
           </React.Fragment>
         )}
 
-        {state !== States.requires_password && (
+        {state !== States.requires_code_pin && (
           <React.Fragment>
             <Text
               size={TextSizes.small}
@@ -116,7 +125,7 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
                 styles.spacingBottom,
                 styles.textUppercase,
               ]}>
-              {errorPayment || successPayment || statusPayment}
+              {errorPayment || statusPayment}
             </Text>
 
             <View style={styles.selfCenter}>
@@ -124,10 +133,11 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
                 {
                   [States.updating_tables]: processingIcon,
                   [States.processing]: processingIcon,
-                  [States.finished]: successIcon,
+                  [States.finished]: null,
                   [States.error]: nfcIcon,
                   [States.cancelled]: nfcIcon,
                   [States.awaiting_credit_card]: nfcIcon,
+                  [States.generic_error]: errorIcon,
                 }[state]
               }
             </View>
@@ -175,11 +185,49 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
               size={TextSizes.small}
               weight={TextWeights.regular}
               style={styles.bold}>
-              {toString(cart.totalAmount)}
+              {/* {toString(cart.totalAmount)} */}
+              {toString(installment.value)}
             </Text>
           </Text>
         )}
       </View>
+
+      {state === States.generic_error && (
+        <View style={[styles.spacingContainer]}>
+          <Button
+            type={ButtonType.primary}
+            onPress={onRetryPayment}
+            title="Tentar novamente"
+          />
+        </View>
+      )}
+
+      {isAvailableAbort && (
+        <View style={[styles.spacingContainer]}>
+          <Button
+            type={ButtonType.primary}
+            onPress={onCancel}
+            title="Cancelar pagamento"
+          />
+        </View>
+      )}
+    </React.Fragment>
+  );
+
+  return (
+    <SafeAreaView edges={['top']} style={styles.safeArea}>
+      {
+        {
+          [States.updating_tables]: renderDefault,
+          [States.requires_code_pin]: renderDefault,
+          [States.processing]: renderDefault,
+          [States.error]: renderDefault,
+          [States.cancelled]: renderDefault,
+          [States.awaiting_credit_card]: renderDefault,
+          [States.generic_error]: renderDefault,
+          [States.finished]: renderSuccess,
+        }[state]
+      }
     </SafeAreaView>
   );
 };

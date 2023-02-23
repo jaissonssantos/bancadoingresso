@@ -128,7 +128,7 @@ export const LoginUI: React.FC<LoginUIProps> = ({
 
           <Button
             type={ButtonType.text}
-            onPress={onLoginPress}
+            onPress={(): void => undefined}
             title="Esqueceu a sua senha?"
             titleStyle={styles.buttonTitle}
             style={styles.button}

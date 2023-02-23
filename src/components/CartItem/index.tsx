@@ -36,7 +36,7 @@ export const CartItem: React.FC<CartItemProps> = ({
             {product.name}
           </Text>
           <Text size={TextSizes.small} weight={TextWeights.medium}>
-            {toString(product.value ?? 0)}
+            {toString(product.unitValue ?? product.value ?? 0)}
           </Text>
         </View>
 
