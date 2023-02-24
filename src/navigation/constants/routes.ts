@@ -32,5 +32,6 @@ export const ROUTES = {
   Payments: {
     PaymentChoiceByInstallment: 'Payments.PaymentChoiceByInstallment',
     PaymentByCreditCard: 'Payments.PaymentByCreditCard',
+    PaymentByDebitCard: 'Payments.PaymentByDebitCard',
   },
 } as const;

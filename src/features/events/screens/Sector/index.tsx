@@ -9,6 +9,7 @@ import {
 import type { EventStackScreenProps } from 'src/navigation/EventStack';
 import type { IProduct } from 'src/model/productDTO';
 import { useForm } from 'src/hooks/useForm';
+import { ROUTES } from 'src/navigation/constants/routes';
 import { SectorUI, ISectorData, SearchFormData } from './ui';
 
 type SectorScreenProps = EventStackScreenProps<'EventsTabHome.Sector'>;
@@ -43,7 +44,7 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
   const handleOnDismiss = (value: boolean): void => setVisible(value);
 
   const handleOnPaymentTypeChoice = (): void => {
-    navigation.navigate('MainTab.Cart');
+    navigation.navigate(ROUTES.MainTab.Cart);
   };
 
   const handleFetchCart = (): void => {

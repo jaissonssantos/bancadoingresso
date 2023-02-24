@@ -22,7 +22,7 @@ export const PaymentTypeChoiceScreen: React.FC<
     navigation.navigate(ROUTES.CartTabHome.PaymentByPix);
 
   const handleOnDebitCardPress = (): void =>
-    navigation.navigate(ROUTES.CartTabHome.PaymentByDebitCard);
+    navigation.navigate(ROUTES.Payments.PaymentByDebitCard, { amount });
 
   const handleOnCreditCardPress = (): void =>
     navigation.navigate(ROUTES.Payments.PaymentChoiceByInstallment, { amount });

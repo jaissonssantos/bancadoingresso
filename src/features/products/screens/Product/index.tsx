@@ -13,6 +13,7 @@ import {
 import { addProductBySubGroup } from 'src/redux/eventsSlice';
 import type { IProduct } from 'src/model/productDTO';
 import type { ISubGroups } from 'src/model/groupDTO';
+import { ROUTES } from 'src/navigation/constants/routes';
 import { ProductUI, SearchFormData } from './ui';
 
 type ProductScreenProps = ProductsStackScreenProps<'ProductsTabHome.Product'>;
@@ -49,7 +50,7 @@ export const ProductScreen: React.FC<ProductScreenProps> = ({
   const handleOnDismiss = (value: boolean): void => setVisible(value);
 
   const handleOnPaymentTypeChoice = (): void => {
-    navigation.navigate('CartTabHome.PaymentCartInput');
+    navigation.navigate(ROUTES.MainTab.Cart as any);
   };
 
   const handleFetchCart = (): void => {
@@ -111,11 +112,11 @@ export const ProductScreen: React.FC<ProductScreenProps> = ({
     );
 
     if (event?.id) {
-      event.sections.map(section => ({
+      event.sections?.map(section => ({
         ...section,
-        group: section.group.map(groupItem => ({
+        group: section?.group?.map(groupItem => ({
           ...groupItem,
-          subGroups: groupItem.subGroups.map(subGroupItem => {
+          subGroups: groupItem?.subGroups?.map(subGroupItem => {
             if (
               subGroupItem.productSubGroupId ===
               subGroupDataFromNavigation.productSubGroupId
@@ -129,8 +130,6 @@ export const ProductScreen: React.FC<ProductScreenProps> = ({
       }));
     }
   }, [events]);
-
-  console.log('cart >>>', cart);
 
   return (
     <ProductUI

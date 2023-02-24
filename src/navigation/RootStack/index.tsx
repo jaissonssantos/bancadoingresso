@@ -11,6 +11,7 @@ import { IntroLoadingScreen, LoginScreen } from 'src/features/auth';
 import {
   PaymentChoiceByInstallmentScreen,
   PaymentByCreditCardScreen,
+  PaymentByDebitCardScreen,
 } from 'src/features/cart';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
 import { Colors } from 'src/styleguide/colors';
@@ -27,6 +28,10 @@ interface PaymentChoiceByInstallmentAmountStack {
   amount: number;
 }
 
+interface PaymentByDebitCardStack {
+  amount: number;
+}
+
 const {
   Auth: AUTH_ROUTES,
   Payments: PAYMENTS_ROUTES,
@@ -39,6 +44,7 @@ export type RootStackParamList = {
   [MAIN_TAB_ROUTES.Itself]: NavigatorScreenParams<MainTabParamList> | undefined;
   [PAYMENTS_ROUTES.PaymentChoiceByInstallment]: PaymentChoiceByInstallmentAmountStack;
   [PAYMENTS_ROUTES.PaymentByCreditCard]: PaymentByCreditCardStack;
+  [PAYMENTS_ROUTES.PaymentByDebitCard]: PaymentByDebitCardStack;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
@@ -80,6 +86,11 @@ export const RootStack: React.FC = () => {
                 name={PAYMENTS_ROUTES.PaymentByCreditCard}
                 component={PaymentByCreditCardScreen}
                 options={{ title: 'Crédito' }}
+              />
+              <Stack.Screen
+                name={PAYMENTS_ROUTES.PaymentByDebitCard}
+                component={PaymentByDebitCardScreen}
+                options={{ title: 'Débito' }}
               />
             </>
           ) : (

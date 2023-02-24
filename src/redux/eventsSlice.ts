@@ -31,13 +31,13 @@ const eventsSlice = createSlice({
       state,
       { payload }: PayloadAction<{ subGroup: string; products: IProduct[] }>,
     ) {
-      const newEvents = state.events.map(event => ({
+      const newEvents = state?.events?.map(event => ({
         ...event,
-        sections: event.sections.map(section => ({
+        sections: event?.sections?.map(section => ({
           ...section,
-          group: section.group?.map(groupItem => ({
+          group: section?.group?.map(groupItem => ({
             ...groupItem,
-            subGroups: groupItem.subGroups.map(subGroup => {
+            subGroups: groupItem?.subGroups?.map(subGroup => {
               if (subGroup.productSubGroupId === payload.subGroup) {
                 return {
                   ...subGroup,

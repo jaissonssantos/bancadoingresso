@@ -13,6 +13,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: PADDING_HORIZONTAL,
   },
+  alignCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   bold: {
     fontWeight: 'bold',
   },
@@ -24,7 +28,7 @@ const styles = StyleSheet.create({
   },
   spacingContainer: {
     paddingHorizontal: PADDING_HORIZONTAL,
-    marginBottom: verticalScale(4),
+    marginBottom: verticalScale(20),
   },
   spacingBottom: {
     marginBottom: verticalScale(12),
@@ -41,6 +45,12 @@ const styles = StyleSheet.create({
   },
   selfCenter: {
     alignSelf: 'center',
+  },
+  textUppercase: {
+    textTransform: 'uppercase',
+  },
+  passwordText: {
+    letterSpacing: scale(1),
   },
 });
 

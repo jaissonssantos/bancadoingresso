@@ -21,20 +21,6 @@ export enum States {
   finished = 'finished',
 }
 
-interface PaymentByCreditCardUIProps {
-  state: States;
-  cart: ICartState;
-  installment: Installment;
-  statusPayment: string | null;
-  errorPayment: string | null;
-  codePin: string | null;
-  isAvailableAbort: boolean;
-  onRetryPayment: () => void;
-  onGoToHome: () => void;
-  onCancel: () => void;
-  onGoToPaymentTypeChoice: () => void;
-}
-
 export interface PaymentByCreditCardEventListener {
   code: number | null;
   message: string;
@@ -53,6 +39,20 @@ export interface PrintSuccessEventListener
 
 export interface PrintErrorEventListener
   extends PaymentByCreditCardEventListener {}
+
+interface PaymentByCreditCardUIProps {
+  state: States;
+  cart: ICartState;
+  installment: Installment;
+  statusPayment: string | null;
+  errorPayment: string | null;
+  codePin: string | null;
+  isAvailableAbort: boolean;
+  onRetryPayment: () => void;
+  onGoToHome: () => void;
+  onCancel: () => void;
+  onGoToPaymentTypeChoice: () => void;
+}
 
 export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
   state,
@@ -96,11 +96,11 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
           title="Voltar para o início"
         />
 
-        <Button
+        {/* <Button
           type={ButtonType.primary}
           onPress={onGoToPaymentTypeChoice}
           title="Voltar para concluir a venda"
-        />
+        /> */}
       </View>
     </React.Fragment>
   );

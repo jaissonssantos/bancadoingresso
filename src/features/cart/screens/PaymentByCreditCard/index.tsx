@@ -12,6 +12,7 @@ import {
 } from 'src/core/native_modules/payment';
 import { useSnackbar } from 'src/hooks/useSnackbar';
 import { PAYMENT_TYPES } from 'src/features/cart/types';
+import { ROUTES } from 'src/navigation/constants/routes';
 import {
   States,
   PaymentByCreditCardUI,
@@ -21,7 +22,6 @@ import {
   PrintSuccessEventListener,
   PrintErrorEventListener,
 } from './ui';
-import { ROUTES } from 'src/navigation/constants/routes';
 
 type PaymentByCreditCardScreenProps =
   RootStackScreenProps<'Payments.PaymentByCreditCard'>;
@@ -30,23 +30,17 @@ export const PaymentByCreditCardScreen: React.FC<
   PaymentByCreditCardScreenProps
 > = ({ navigation, route }) => {
   const installmentFromNavigation = route.params.installment;
-  log.i(
-    `installmentFromNavigation >>> ${JSON.stringify(
-      installmentFromNavigation,
-    )}`,
-  );
 
   const snackbar = useSnackbar();
+  const dispatch = useDispatch();
   const cart = useSelector(useCart);
   const [state, setState] = useState(States.awaiting_credit_card);
-
   const [statusPayment, setStatusPayment] = useState<string | null>(
     'AGUARDE...',
   );
   const [isAvailableAbort, setIsAvailableAbort] = useState(false);
   const [errorPayment, setErrorPayment] = useState<string | null>(null);
   const [codePin, setCodePin] = useState<string | null>(null);
-  const dispatch = useDispatch();
   const eventEmitter = new NativeEventEmitter(PaymentModule);
 
   const handleOnStartPayment = async (): Promise<void> => {
@@ -86,11 +80,11 @@ export const PaymentByCreditCardScreen: React.FC<
     abortPayment();
   };
 
-  // useEffect(() => {
-  //   new Promise(resolve => setTimeout(resolve, 500)).then(async () => {
-  //     handleOnStartPayment();
-  //   });
-  // }, []);
+  useEffect(() => {
+    new Promise(resolve => setTimeout(resolve, 500)).then(async () => {
+      handleOnStartPayment();
+    });
+  }, []);
 
   useEffect(() => {
     if (state === States.finished) {
