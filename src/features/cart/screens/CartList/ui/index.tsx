@@ -13,6 +13,7 @@ import { styles } from './styles';
 
 interface CartListUIProps {
   cart: ICartState;
+  fee: number;
   onAddProduct: (product: IProduct) => void;
   onSubtractProduct: (product: IProduct) => void;
   onRemoveAllProduct: () => void;
@@ -21,6 +22,7 @@ interface CartListUIProps {
 
 export const CartListUI: React.FC<CartListUIProps> = ({
   cart,
+  fee,
   onAddProduct,
   onSubtractProduct,
   onRemoveAllProduct,
@@ -70,7 +72,7 @@ export const CartListUI: React.FC<CartListUIProps> = ({
           weight={TextWeights.medium}
           align={TextAligns.center}
           style={styles.spacingTop}>
-          {toString(cart.totalAmount)}
+          {toString(fee)}
         </Text>
       </View>
 

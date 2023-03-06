@@ -6,10 +6,13 @@ import {
   addItemToCart,
   removeItemFromCart,
 } from 'src/redux/cartSlice';
+import { useFees, addFees } from 'src/redux/feesSlice';
 import type { EventStackScreenProps } from 'src/navigation/EventStack';
 import type { IProduct } from 'src/model/productDTO';
 import { useForm } from 'src/hooks/useForm';
 import { ROUTES } from 'src/navigation/constants/routes';
+import { feeToNumber } from 'src/util/formatters';
+import { calculateFees } from 'src/util/helpers';
 import { SectorUI, ISectorData, SearchFormData } from './ui';
 
 type SectorScreenProps = EventStackScreenProps<'EventsTabHome.Sector'>;
@@ -24,8 +27,14 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
   );
   const [visible, setVisible] = useState(false);
 
-  const cart = useSelector(useCart);
   const dispatch = useDispatch();
+  const cart = useSelector(useCart);
+  const { maximumFee } = useSelector(useFees);
+
+  const fee = calculateFees(
+    feeToNumber(cart.totalAmount),
+    feeToNumber(maximumFee?.administrateTax),
+  );
 
   const { formData, onChangeInput } = useForm<SearchFormData>({
     initialData: { query: '' },
@@ -63,6 +72,7 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
         };
       });
 
+      dispatch(addFees(cart.items));
       setSectorData({ ...sectorData, tickets: newSector });
     } else {
       const newSector = sectorDataFromNavigation.tickets.map(ticket => ({
@@ -105,6 +115,7 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
 
   return (
     <SectorUI
+      fee={fee}
       cart={cart}
       visible={visible}
       sectorData={sectorData}

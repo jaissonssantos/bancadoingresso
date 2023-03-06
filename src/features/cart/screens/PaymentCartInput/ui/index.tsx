@@ -20,6 +20,7 @@ interface PaymentCartInputUIProps
     'formErrors' | 'formData'
   > {
   cart: ICartState;
+  fee: number;
   onChangeAmount: (amount: string) => void;
   onPaymentTypeChoice: () => void;
   submitDisabled: boolean;
@@ -27,6 +28,7 @@ interface PaymentCartInputUIProps
 
 export const PaymentCartInputUI: React.FC<PaymentCartInputUIProps> = ({
   cart,
+  fee,
   formData,
   formErrors,
   submitDisabled,
@@ -70,7 +72,7 @@ export const PaymentCartInputUI: React.FC<PaymentCartInputUIProps> = ({
           weight={TextWeights.medium}
           align={TextAligns.center}
           style={styles.spacingTop}>
-          {toString(cart.totalAmount)}
+          {toString(fee)}
         </Text>
       </View>
 

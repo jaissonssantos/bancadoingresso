@@ -5,7 +5,6 @@ import { scale } from 'src/styleguide/scaling';
 const stylesPrimary = StyleSheet.create({
   pressable: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
     borderRadius: scale(6),
     backgroundColor: Colors.primary,
@@ -13,6 +12,7 @@ const stylesPrimary = StyleSheet.create({
     minHeight: scale(45),
   },
   text: {
+    flex: 1,
     marginHorizontal: scale(10),
   },
   loadingContainer: {

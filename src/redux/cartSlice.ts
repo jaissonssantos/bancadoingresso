@@ -19,7 +19,6 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addItemToCart(state, { payload }: PayloadAction<IProduct>) {
-      console.log('payload >>', payload);
       const existingItem = state.items.find(
         item =>
           item.id === payload.id &&
@@ -40,10 +39,12 @@ const cartSlice = createSlice({
           count: payload.count,
           value: newValue ?? 0,
           unitValue: newValue ?? 0,
+          fee: payload.fee,
           isHalfPrice: payload.isHalfPrice ?? false,
           quantity: 1,
           totalPrice: newValue ?? 0,
           payment: payload.payment,
+          physicalSale: payload?.physicalSale,
         });
       } else {
         const quantity = existingItem?.quantity ?? 1;
@@ -52,6 +53,8 @@ const cartSlice = createSlice({
         existingItem.quantity = quantity + 1;
         existingItem.totalPrice = totalPrice + newValue;
       }
+
+      console.log('state >>> ', JSON.stringify(state.items));
     },
     removeItemFromCart(state, { payload }: PayloadAction<IProduct>) {
       const existingItem = state.items.find(

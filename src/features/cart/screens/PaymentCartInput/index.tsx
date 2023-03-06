@@ -1,9 +1,12 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useCart } from 'src/redux/cartSlice';
+import { useFees, addFees } from 'src/redux/feesSlice';
 import { useForm } from 'src/hooks/useForm';
 import { toString, convertAmountToNumber } from 'src/util/currency';
 import type { CartStackScreenProps } from 'src/navigation/CartStack';
+import { calculateFees } from 'src/util/helpers';
+import { feeToNumber } from 'src/util/formatters';
 import { PaymentCartInputUI, PaymentCartInputFormData } from './ui';
 
 type PaymentCartInputScreenProps =
@@ -12,7 +15,13 @@ type PaymentCartInputScreenProps =
 export const PaymentCartInputScreen: React.FC<PaymentCartInputScreenProps> = ({
   navigation,
 }) => {
+  const dispatch = useDispatch();
   const cart = useSelector(useCart);
+  const { maximumFee } = useSelector(useFees);
+  const fee = calculateFees(
+    feeToNumber(cart.totalAmount),
+    feeToNumber(maximumFee?.administrateTax),
+  );
 
   const { formData, formErrors, onChangeInput } =
     useForm<PaymentCartInputFormData>({
@@ -27,6 +36,8 @@ export const PaymentCartInputScreen: React.FC<PaymentCartInputScreenProps> = ({
   };
 
   const handleOnPaymentTypeChoice = (): void => {
+    dispatch(addFees(cart.items));
+
     navigation.navigate('CartTabHome.PaymentTypeChoice', {
       amount: convertAmountToNumber(formData.amount),
     });
@@ -42,6 +53,7 @@ export const PaymentCartInputScreen: React.FC<PaymentCartInputScreenProps> = ({
   return (
     <PaymentCartInputUI
       cart={cart}
+      fee={fee}
       formData={formData}
       formErrors={formErrors}
       onChangeAmount={handleOnChangeAmount}

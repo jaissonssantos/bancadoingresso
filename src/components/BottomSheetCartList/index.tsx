@@ -18,6 +18,7 @@ import {
   removeItemFromCart,
   removeAllItemFromCart,
 } from 'src/redux/cartSlice';
+import { useFees } from 'src/redux/feesSlice';
 import type { IProduct } from 'src/model/productDTO';
 import { CartItem } from 'src/components/CartItem';
 import { BottomSheetBackdrop } from 'src/components/BottomSheetBackdrop';
@@ -27,6 +28,8 @@ import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
 import { Colors } from 'src/styleguide/colors';
 import { PressableOpacity } from '../PressableOpacity';
 import { toString } from 'src/util/currency';
+import { calculateFees } from 'src/util/helpers';
+import { feeToNumber } from 'src/util/formatters';
 import styles from './styles';
 
 interface BottomSheetCartListProps {
@@ -41,8 +44,13 @@ export const BottomSheetCartList: React.FC<BottomSheetCartListProps> = ({
   onContinue,
 }) => {
   const sheetRef = useRef<BottomSheetModal>(null);
-  const cart = useSelector(useCart);
   const dispatch = useDispatch();
+  const cart = useSelector(useCart);
+  const { maximumFee } = useSelector(useFees);
+  const fee = calculateFees(
+    feeToNumber(cart.totalAmount),
+    feeToNumber(maximumFee?.administrateTax),
+  );
 
   const snapPoints = useMemo(() => ['95%'], []);
 
@@ -165,7 +173,7 @@ export const BottomSheetCartList: React.FC<BottomSheetCartListProps> = ({
                 Valor total do pedido:
               </Text>
               <Text size={TextSizes.small} align={TextAligns.left}>
-                {toString(cart.totalAmount)}
+                {toString(fee)}
               </Text>
             </View>
 

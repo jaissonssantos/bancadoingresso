@@ -9,6 +9,7 @@ const stylesText = StyleSheet.create({
     minHeight: scale(45),
   },
   text: {
+    flex: 1,
     marginLeft: scale(5),
   },
   loadingContainer: {

@@ -54,6 +54,12 @@ const styles = StyleSheet.create({
   spacingBottom: {
     marginBottom: verticalScale(12),
   },
+  bold: {
+    fontWeight: 'bold',
+  },
+  spacingTopSmall: {
+    marginTop: verticalScale(2),
+  },
 });
 
 export { styles };

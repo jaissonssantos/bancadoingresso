@@ -5,8 +5,6 @@ import { scale, verticalScale } from 'src/styleguide/scaling';
 const styles = StyleSheet.create({
   container: {
     maxWidth: scale(98),
-    alignItems: 'center',
-    justifyContent: 'center',
     overflow: 'hidden',
     margin: verticalScale(4),
   },
@@ -16,7 +14,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   column: {
-    padding: 0,
+    paddingHorizontal: scale(2),
   },
   item: {
     position: 'relative',

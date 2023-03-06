@@ -18,6 +18,9 @@ import { styles } from './styles';
 interface PaymentTypeChoiceUIProps {
   cart: ICartState;
   amount: number;
+  cashFee: number;
+  debitCardFee: number;
+  pixFee: number;
   onMoneyPress: () => void;
   onPixPress: () => void;
   onDebitCardPress: () => void;
@@ -27,6 +30,9 @@ interface PaymentTypeChoiceUIProps {
 export const PaymentTypeChoiceUI: React.FC<PaymentTypeChoiceUIProps> = ({
   cart,
   amount,
+  cashFee,
+  debitCardFee,
+  pixFee,
   onMoneyPress,
   onPixPress,
   onDebitCardPress,
@@ -55,6 +61,13 @@ export const PaymentTypeChoiceUI: React.FC<PaymentTypeChoiceUIProps> = ({
             style={styles.spacingTop}>
             Dinheiro
           </Text>
+          <Text
+            size={TextSizes.small}
+            weight={TextWeights.bold}
+            align={TextAligns.center}
+            style={[styles.bold, styles.spacingTopSmall]}>
+            {toString(amount)}
+          </Text>
         </PressableOpacity>
 
         <PressableOpacity onPress={onPixPress} style={styles.paymentMethod}>
@@ -65,6 +78,22 @@ export const PaymentTypeChoiceUI: React.FC<PaymentTypeChoiceUIProps> = ({
             align={TextAligns.center}
             style={styles.spacingTop}>
             Pix
+          </Text>
+          {pixFee - amount > 0 && (
+            <Text
+              size={TextSizes.xxsmall}
+              weight={TextWeights.light}
+              align={TextAligns.center}
+              style={styles.spacingTopSmall}>
+              {toString(amount)} + {toString(pixFee - amount)} (taxa)
+            </Text>
+          )}
+          <Text
+            size={TextSizes.small}
+            weight={TextWeights.bold}
+            align={TextAligns.center}
+            style={[styles.bold, styles.spacingTopSmall]}>
+            {toString(pixFee)}
           </Text>
         </PressableOpacity>
 
@@ -78,6 +107,20 @@ export const PaymentTypeChoiceUI: React.FC<PaymentTypeChoiceUIProps> = ({
             align={TextAligns.center}
             style={styles.spacingTop}>
             Débito
+          </Text>
+          <Text
+            size={TextSizes.xxsmall}
+            weight={TextWeights.light}
+            align={TextAligns.center}
+            style={styles.spacingTopSmall}>
+            {toString(amount)} + {toString(debitCardFee - amount)} (taxa)
+          </Text>
+          <Text
+            size={TextSizes.small}
+            weight={TextWeights.bold}
+            align={TextAligns.center}
+            style={[styles.bold, styles.spacingTopSmall]}>
+            {toString(debitCardFee)}
           </Text>
         </PressableOpacity>
 
@@ -101,14 +144,14 @@ export const PaymentTypeChoiceUI: React.FC<PaymentTypeChoiceUIProps> = ({
           weight={TextWeights.regular}
           align={TextAligns.center}
           style={styles.spacingTop}>
-          Valor a ser pago:
+          Restando pagar:
         </Text>
         <Text
           size={TextSizes.small}
           weight={TextWeights.medium}
           align={TextAligns.center}
           style={styles.spacingTop}>
-          {toString(amount)}
+          {toString(cart.totalAmount - amount)}
         </Text>
       </View>
 

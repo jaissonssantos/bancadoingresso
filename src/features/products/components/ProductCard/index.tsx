@@ -8,6 +8,8 @@ import { PressableOpacity } from 'src/components/PressableOpacity';
 import { Colors } from 'src/styleguide/colors';
 import { toString } from 'src/util/currency';
 import type { IProduct } from 'src/model/productDTO';
+import { feeToNumber } from 'src/util/formatters';
+import { calculateFees } from 'src/util/helpers';
 import { styles } from './styles';
 
 interface ProductCardProps {
@@ -27,6 +29,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const quantity = product.quantity ?? 0;
   const maxLimit = product.amount ?? 0;
+  const amount = product.unitValue ?? product.value ?? 0;
+
+  const fee = product?.fee
+    ? calculateFees(feeToNumber(amount), feeToNumber(product.fee))
+    : calculateFees(
+        feeToNumber(amount),
+        feeToNumber(product.physicalSale?.administrateTax),
+      );
 
   const finalStyleButtonSubtract = [
     product.quantity === 0 ? { opacity: 0.5 } : {},
@@ -73,7 +83,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               </Text>
 
               <PressableOpacity
-                onPress={(): void => onAdd(product)}
+                onPress={(): void =>
+                  quantity < maxLimit ? onAdd(product) : undefined
+                }
                 disabled={quantity >= maxLimit}>
                 <PlusIcon size={IconSizes.small} stroke={Colors.white} />
               </PressableOpacity>
@@ -87,7 +99,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {product.name}
         </Text>
         <Text size={TextSizes.small} weight={TextWeights.medium}>
-          {toString(product.unitValue ?? 0)}
+          {toString(amount)} + {toString(fee - amount)} (taxa)
         </Text>
       </View>
     </View>

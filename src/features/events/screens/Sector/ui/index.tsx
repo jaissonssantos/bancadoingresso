@@ -24,6 +24,7 @@ export interface ISectorData extends ISections {
 
 interface SectorUIProps
   extends Pick<UseFormReturn<SearchFormData>, 'onChangeInput' | 'formData'> {
+  fee: number;
   cart: ICartState;
   visible: boolean;
   sectorData: ISectorData;
@@ -35,6 +36,7 @@ interface SectorUIProps
 }
 
 export const SectorUI: React.FC<SectorUIProps> = ({
+  fee,
   cart,
   visible,
   sectorData,
@@ -84,11 +86,13 @@ export const SectorUI: React.FC<SectorUIProps> = ({
           onPress={onGoToCart}
           textAlign={TextAligns.center}
           icon={
-            <View style={styles.iconRight}>
-              <Text size={TextSizes.small} weight={TextWeights.bold}>
-                {toString(cart.totalAmount)}
-              </Text>
-            </View>
+            <Text
+              size={TextSizes.small}
+              align={TextAligns.right}
+              weight={TextWeights.bold}
+              style={styles.iconRight}>
+              {toString(fee)}
+            </Text>
           }
           iconPosition={ButtonIconPosition.right}
         />

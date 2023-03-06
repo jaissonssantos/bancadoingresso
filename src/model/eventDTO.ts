@@ -1,7 +1,7 @@
 import type { IGroup } from './groupDTO';
 
 export interface IFees {
-  id: string;
+  id: string | null;
   allowCreditCardPayment: boolean;
   debit: number | null;
   credit: number | null;
@@ -21,16 +21,30 @@ export interface IPayment {
   fees: IFees;
 }
 
+export interface IPhysicalSale {
+  id: string;
+  allowCreditCardPayment: boolean;
+  debit: number | string | null;
+  credit: number | string | null;
+  bankSlip: number | string;
+  pix: number | string;
+  installments: number;
+  administrateTax: number | string;
+  fee: number | string;
+}
+
 export interface ITickets {
   id: string;
   name: string;
   value: number;
+  fee?: number;
   unitValue?: number;
   count: number;
   isHalfPrice: boolean;
   quantity: number;
   totalPrice: number;
   payment: IPayment;
+  physicalSale?: IPhysicalSale | IFees;
 }
 
 export interface ISection {

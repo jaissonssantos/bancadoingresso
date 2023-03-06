@@ -14,6 +14,7 @@ const stylesOutlined = StyleSheet.create({
     minHeight: scale(45),
   },
   text: {
+    flex: 1,
     marginHorizontal: scale(10),
   },
   loadingContainer: {

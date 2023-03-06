@@ -52,8 +52,8 @@ export const ProductUI: React.FC<ProductUIProps> = ({
       <Skeleton style={styles.skeletonTitle} />
 
       <View style={styles.productList}>
-        {Array.from({ length: 9 }).map(_ => (
-          <View style={styles.skeletonProduct}>
+        {Array.from({ length: 9 }).map((_, index) => (
+          <View key={index} style={styles.skeletonProduct}>
             <Skeleton style={styles.skeletonProductImage} />
             <Skeleton style={styles.skeletonProductTitle} />
             <Skeleton style={styles.skeletonProductPrice} />

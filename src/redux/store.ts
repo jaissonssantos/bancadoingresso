@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import eventsReducer from './eventsSlice';
 import productsReducer from './productsSlice';
 import cartReducer from './cartSlice';
+import feesReducer from './feesSlice';
 
 const createDebugger = require('redux-flipper').default;
 
@@ -10,6 +11,7 @@ export const store = configureStore({
     cart: cartReducer,
     events: eventsReducer,
     products: productsReducer,
+    fees: feesReducer,
   },
   middleware: getDefaultMiddleware =>
     __DEV__
