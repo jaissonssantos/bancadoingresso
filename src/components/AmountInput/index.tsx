@@ -10,6 +10,7 @@ interface AmountInputProps extends Omit<TextInputProps, 'onChangeText'> {
   label?: string;
   containerStyle?: ViewProps['style'];
   error?: string;
+  editable?: boolean;
   renderForward?: () => React.ReactNode;
   onChangeText: (text: string) => void;
 }
@@ -20,6 +21,7 @@ export const AmountInput = memo<AmountInputProps>(
     containerStyle,
     style,
     error,
+    editable,
     maxLength,
     value,
     onChangeText,
@@ -33,6 +35,7 @@ export const AmountInput = memo<AmountInputProps>(
           maxLength={maxLength}
           onChangeText={(text: string): void => onChangeText(text)}
           value={value}
+          editable={editable}
           {...rest}
         />
         {!renderForward && (

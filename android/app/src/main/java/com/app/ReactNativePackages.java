@@ -1,6 +1,5 @@
 package com.app;
 
-import com.app.pagseguro.NFCModule;
 import com.app.pagseguro.PaymentModule;
 import com.app.pagseguro.AuthenticationModule;
 
@@ -33,7 +32,6 @@ public class ReactNativePackages implements ReactPackage {
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
     List<NativeModule> modules = new ArrayList<>();
     modules.add(new AuthenticationModule(reactContext));
-    modules.add(new NFCModule(reactContext));
     modules.add(new PaymentModule(reactContext));
 
     if (BuildConfig.DEBUG) {

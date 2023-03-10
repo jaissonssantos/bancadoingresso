@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PressableOpacity } from 'src/components/PressableOpacity';
 import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
 import { Skeleton } from 'src/components/Skeleton';
-// import type { ICartState } from 'src/redux/cartSlice';
 import { toString } from 'src/util/currency';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
 import { styles } from './styles';
@@ -39,13 +38,13 @@ export const PaymentChoiceByInstallmentUI: React.FC<
             style={styles.bold}>
             {item.quantity}x
           </Text>{' '}
-          {toString(item.value)}
+          {toString(item.value / item.quantity)}
         </Text>
         <View style={styles.row}>
           {item.quantity > 1 ? (
             <React.Fragment>
               <Text size={TextSizes.small} weight={TextWeights.regular}>
-                {toString(item.quantity * item.value)}
+                {toString(item.value)}
               </Text>
               <Text
                 size={TextSizes.small}
@@ -86,10 +85,10 @@ export const PaymentChoiceByInstallmentUI: React.FC<
     <FlatList
       contentContainerStyle={styles.container}
       data={installments}
-      keyExtractor={(item): string =>
-        `${item.quantity.toString()} - ${item.value.toString()}`
-      }
-      renderItem={({ item }): ReactElement => <RenderInstallment item={item} />}
+      keyExtractor={(item): string => item.id!}
+      renderItem={({ item }): ReactElement => (
+        <RenderInstallment key={item.id!} item={item} />
+      )}
       ItemSeparatorComponent={(): ReactElement => (
         <View style={styles.separator} />
       )}
@@ -108,20 +107,6 @@ export const PaymentChoiceByInstallmentUI: React.FC<
           align={TextAligns.left}
           style={styles.bold}>
           Escolha a quantidade de parcelas
-        </Text>
-
-        <Text
-          size={TextSizes.small}
-          weight={TextWeights.bold}
-          align={TextAligns.left}
-          style={styles.spacingTop}>
-          Até{' '}
-          <Text
-            size={TextSizes.small}
-            weight={TextWeights.bold}
-            style={styles.bold}>
-            2 parcelas sem juros
-          </Text>
         </Text>
       </View>
 

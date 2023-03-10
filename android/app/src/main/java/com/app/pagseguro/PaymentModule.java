@@ -25,7 +25,6 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.listeners.PlugPagPaymentListe
 import static com.app.pagseguro.Constants.TYPE_CREDITO;
 import static com.app.pagseguro.Constants.TYPE_PIX;
 import static com.app.pagseguro.Constants.TYPE_DEBITO;
-import static com.app.pagseguro.Constants.USER_REFERENCE;
 import static com.app.pagseguro.Constants.INSTALLMENT_TYPE_A_VISTA;
 import static com.app.pagseguro.Constants.INSTALLMENT_TYPE_PARC_COMPRADOR;
 import static com.app.pagseguro.Constants.HEAD_TEXT_COLOR;
@@ -66,7 +65,7 @@ public class PaymentModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startPayment(int value, int installments, int type) {
+    public void startPayment(int value, int installments, int type, String user_reference) {
         Log.i(TAG, "Call startPayment");
         setStyle();
 
@@ -77,7 +76,7 @@ public class PaymentModule extends ReactContextBaseJavaModule {
             public void run() {
 
                 try {
-                    doCreditPaymentBuyerInstallments(value, installments, type);
+                    doCreditPaymentBuyerInstallments(value, installments, type, user_reference);
 
                 } catch (Exception e) {
                     Log.i(TAG, "Error on call startPayment: " + e.getMessage());
@@ -86,7 +85,7 @@ public class PaymentModule extends ReactContextBaseJavaModule {
         }, 100);
     }
 
-    public void doCreditPaymentBuyerInstallments(int value, int installments, int type) {
+    public void doCreditPaymentBuyerInstallments(int value, int installments, int type, String user_reference) {
         int payment_type = TYPE_CREDITO;
 
         if(type == TYPE_CREDITO){
@@ -110,7 +109,7 @@ public class PaymentModule extends ReactContextBaseJavaModule {
                 value,
                 installment_type,
                 installments,
-                USER_REFERENCE,
+                user_reference,
                 true
         ));
     }
@@ -121,7 +120,7 @@ public class PaymentModule extends ReactContextBaseJavaModule {
         mPlugPag.doAsyncPayment(paymentData, new PlugPagPaymentListener() {
             @Override
             public void onSuccess(@NonNull PlugPagTransactionResult plugPagTransactionResult) {
-                WritableMap params = createObjectToEvent(plugPagTransactionResult);
+                WritableMap params = createObjectToEventSuccessPayment(plugPagTransactionResult);
                 sendEvent("eventSuccessPayment", params);
                 resetCountPassword();
 
@@ -257,6 +256,14 @@ public class PaymentModule extends ReactContextBaseJavaModule {
     }
 
     private WritableMap createObjectToEvent(PlugPagTransactionResult transactionResult) {
+        WritableMap params = Arguments.createMap();
+        params.putString("message", transactionResult.getMessage());
+        params.putString("code", transactionResult.getTransactionCode());
+
+        return params;
+    }
+
+    private WritableMap createObjectToEventSuccessPayment(PlugPagTransactionResult transactionResult) {
         WritableMap params = Arguments.createMap();
         params.putString("message", transactionResult.getMessage());
         params.putString("code", transactionResult.getTransactionCode());

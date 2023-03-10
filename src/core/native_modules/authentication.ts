@@ -2,14 +2,18 @@ import { NativeModules } from 'react-native';
 
 const { AuthenticationModule } = NativeModules;
 
-export const isAuthenticated = async (): Promise<boolean> => {
+export const isAuthenticated = async (): Promise<{
+  id: string | null;
+  terminalSerialNumber: string | null;
+  enabled: boolean;
+}> => {
   return await AuthenticationModule.isAuthenticated();
 };
 
-export const initializeAndActivatePinpad = async (
+export const initializeAndActivatePinPad = async (
   activationCode: string,
 ): Promise<number | string> => {
-  return await AuthenticationModule.initializeAndActivatePinpad(activationCode);
+  return await AuthenticationModule.initializeAndActivatePinPad(activationCode);
 };
 
 export const deactivate = async (

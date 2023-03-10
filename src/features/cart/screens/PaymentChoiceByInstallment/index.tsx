@@ -1,19 +1,11 @@
 import React, { useEffect } from 'react';
-import { NativeEventEmitter } from 'react-native';
-// import { useSelector } from 'react-redux';
-// import { useCart } from 'src/redux/cartSlice';
+import { useSelector } from 'react-redux';
+import { useFees } from 'src/redux/feesSlice';
 import type { RootStackScreenProps } from 'src/navigation/RootStack';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
-import {
-  getAvailableInstallments,
-  PaymentModule,
-} from 'src/core/native_modules/payment';
-import { formatInstallments } from 'src/features/cart/utils';
-import {
-  PaymentChoiceByInstallmentUI,
-  EventCodeGetAvailableInstallmentsListener,
-  States,
-} from './ui';
+import { getInstallments } from 'src/features/cart/utils';
+import { feeToNumber } from 'src/util/formatters';
+import { PaymentChoiceByInstallmentUI, States } from './ui';
 
 type PaymentChoiceByInstallmentScreenProps =
   RootStackScreenProps<'Payments.PaymentChoiceByInstallment'>;
@@ -21,9 +13,10 @@ type PaymentChoiceByInstallmentScreenProps =
 export const PaymentChoiceByInstallmentScreen: React.FC<
   PaymentChoiceByInstallmentScreenProps
 > = ({ navigation, route }) => {
-  const eventEmitter = new NativeEventEmitter(PaymentModule);
+  const { maximumFee } = useSelector(useFees);
 
-  const amount = route.params.amount || 0;
+  const amount = route.params.amount ?? 0;
+  const uuid = route.params.uuid ?? null;
 
   const [state, setState] = React.useState<States>(States.loading);
   const [installments, setInstallments] = React.useState<Installment[]>([]);
@@ -31,39 +24,24 @@ export const PaymentChoiceByInstallmentScreen: React.FC<
   const handleOnInstallmentPress = (value: Installment): void => {
     navigation.navigate('Payments.PaymentByCreditCard', {
       installment: value,
+      uuid,
     });
   };
 
   const handleOnFetchInstallments = (): void => {
-    new Promise(resolve => setTimeout(resolve, 100)).then(() => {
-      getAvailableInstallments(amount);
-    });
+    const getAvailableInstallments = getInstallments(
+      amount,
+      feeToNumber(maximumFee?.fee),
+      maximumFee?.installments,
+    );
+
+    setInstallments(getAvailableInstallments);
+
+    setState(States.default);
   };
 
   useEffect(() => {
     handleOnFetchInstallments();
-  }, []);
-
-  useEffect(() => {
-    const eventCodeGetAvailableInstallmentsListener = eventEmitter.addListener(
-      'eventCodeGetAvailableInstallments',
-      ({
-        installments: installmentsData,
-      }: EventCodeGetAvailableInstallmentsListener): void => {
-        const data: number[] = JSON.parse(installmentsData);
-
-        if (data.length > 0) {
-          setInstallments(formatInstallments(data));
-
-          setState(States.default);
-        }
-      },
-    );
-
-    return (): void => {
-      eventCodeGetAvailableInstallmentsListener.remove();
-      eventEmitter.removeAllListeners('eventCodeGetAvailableInstallments');
-    };
   }, []);
 
   return (

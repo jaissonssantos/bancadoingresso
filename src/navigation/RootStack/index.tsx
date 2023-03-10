@@ -22,14 +22,17 @@ import { StyleSheet } from 'react-native';
 
 interface PaymentByCreditCardStack {
   installment: Installment;
+  uuid: string;
 }
 
 interface PaymentChoiceByInstallmentAmountStack {
   amount: number;
+  uuid: string;
 }
 
 interface PaymentByDebitCardStack {
   amount: number;
+  uuid: string;
 }
 
 const {

@@ -1,7 +1,9 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useBackHandler } from '@react-native-community/hooks';
 import { useFees } from 'src/redux/feesSlice';
 import { useCart } from 'src/redux/cartSlice';
+import { removePaymentItem } from 'src/redux/paymentsSlice';
 import type { CartStackScreenProps } from 'src/navigation/CartStack';
 import { ROUTES } from 'src/navigation/constants/routes';
 import { calculateFees } from 'src/util/helpers';
@@ -14,54 +16,72 @@ type PaymentTypeChoiceScreenProps =
 export const PaymentTypeChoiceScreen: React.FC<
   PaymentTypeChoiceScreenProps
 > = ({ navigation, route }) => {
+  const dispatch = useDispatch();
   const cart = useSelector(useCart);
   const { maximumFee } = useSelector(useFees);
 
-  console.log('maximumFee >>>', maximumFee);
-  const amountFromNavigation = route.params.amount ?? 0;
+  const amount = route.params.amount ?? 0;
+  const uuid = route.params.uuid ?? null;
 
-  const amount =
-    amountFromNavigation < cart.totalAmount
-      ? amountFromNavigation
-      : cart.totalAmount;
-
-  const amountFee = calculateFees(
-    cart.totalAmount,
+  const totalAmountFee = calculateFees(
+    feeToNumber(cart.totalAmount),
     feeToNumber(maximumFee?.administrateTax),
   );
 
+  const creditCardPercentageFee =
+    feeToNumber(maximumFee?.administrateTax) + feeToNumber(maximumFee?.credit);
   const debitCardPercentageFee =
-    feeToNumber(maximumFee?.fee) + feeToNumber(maximumFee?.debit);
+    feeToNumber(maximumFee?.administrateTax) + feeToNumber(maximumFee?.debit);
   const pixPercentageFee =
-    feeToNumber(maximumFee?.fee) + feeToNumber(maximumFee?.pix);
+    feeToNumber(maximumFee?.administrateTax) + feeToNumber(maximumFee?.pix);
 
+  const creditCardFee = calculateFees(amount, creditCardPercentageFee);
   const debitCardFee = calculateFees(amount, debitCardPercentageFee);
   const pixFee = calculateFees(amount, pixPercentageFee);
+  console.log('pixFee >>> ', pixFee - amount);
+  console.log('totalAmountFee >>> ', totalAmountFee);
 
   const handleOnMoneyPress = (): void =>
     navigation.navigate(ROUTES.CartTabHome.PaymentByCash, {
       amount,
+      uuid,
     });
 
-  const handleOnPixPress = (): void =>
-    navigation.navigate(ROUTES.CartTabHome.PaymentByPix);
+  const handleOnPixPress = (): void => undefined;
+  // navigation.navigate(ROUTES.CartTabHome.PaymentByPix);
 
   const handleOnDebitCardPress = (): void =>
     navigation.navigate(ROUTES.Payments.PaymentByDebitCard, {
-      amount: amountFee,
+      amount: totalAmountFee,
+      uuid,
     });
 
   const handleOnCreditCardPress = (): void =>
     navigation.navigate(ROUTES.Payments.PaymentChoiceByInstallment, {
-      amount: amountFee,
+      amount: creditCardFee,
+      uuid,
     });
+
+  useBackHandler(() => {
+    return true;
+  });
+
+  useEffect(() => {
+    navigation.addListener('beforeRemove', e => {
+      if (e.data.action.type === 'GO_BACK') {
+        dispatch(removePaymentItem(uuid));
+      }
+    });
+  }, []);
 
   return (
     <PaymentTypeChoiceUI
-      cart={cart}
-      amount={amountFee / 100}
-      cashFee={amountFee / 100}
+      // cart={cart}
+      amount={amount / 100}
+      totalAmountFee={totalAmountFee}
+      cashFee={amount / 100}
       debitCardFee={debitCardFee / 100}
+      creditCardFee={creditCardFee / 100}
       pixFee={pixFee / 100}
       onMoneyPress={handleOnMoneyPress}
       onPixPress={handleOnPixPress}

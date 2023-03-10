@@ -19,9 +19,6 @@ export const ROUTES = {
     PaymentCartInput: 'CartTabHome.PaymentCartInput',
     PaymentTypeChoice: 'CartTabHome.PaymentTypeChoice',
     PaymentByCash: 'CartTabHome.PaymentByCash',
-    PaymentByPix: 'CartTabHome.PaymentByPix',
-    PaymentByDebitCard: 'CartTabHome.PaymentByDebitCard',
-    PaymentByCreditCard: 'CartTabHome.PaymentByCreditCard',
   },
   ProductsTabHome: {
     itself: 'ProductsTabHome.itself',

@@ -3,7 +3,6 @@ import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
 import { SuccessIcon, IconSizes, NFCIcon, ErrorIcon } from 'src/assets/icons';
-import type { ICartState } from 'src/redux/cartSlice';
 import { toString } from 'src/util/currency';
 import { Colors } from 'src/styleguide/colors';
 import { Button, ButtonType } from 'src/components/Button';
@@ -18,6 +17,8 @@ export enum States {
   error = 'error',
   generic_error = 'generic_error',
   cancelled = 'cancelled',
+  order_save_loading = 'order_save_loading',
+  order_save_error = 'order_save_error',
   finished = 'finished',
 }
 
@@ -42,30 +43,36 @@ export interface PrintErrorEventListener
 
 interface PaymentByCreditCardUIProps {
   state: States;
-  cart: ICartState;
+  totalAmountFromSplitPayment: number;
+  totalAmountFee: number;
   installment: Installment;
   statusPayment: string | null;
   errorPayment: string | null;
   codePin: string | null;
   isAvailableAbort: boolean;
+  errorOrderSave: string | null;
   onRetryPayment: () => void;
   onGoToHome: () => void;
   onCancel: () => void;
   onGoToPaymentTypeChoice: () => void;
+  onRetryOrderSave: () => void;
 }
 
 export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
   state,
-  cart,
+  totalAmountFromSplitPayment,
+  totalAmountFee,
   installment,
   statusPayment,
   errorPayment,
   codePin,
   isAvailableAbort,
+  errorOrderSave,
   onRetryPayment,
   onGoToHome,
   onCancel,
   onGoToPaymentTypeChoice,
+  onRetryOrderSave,
 }) => {
   const nfcIcon = <NFCIcon size={IconSizes.medium} fill={Colors.white} />;
   const errorIcon = (
@@ -90,17 +97,19 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
         </Text>
       </View>
       <View style={[styles.spacingContainer]}>
-        <Button
-          type={ButtonType.secondary}
-          onPress={onGoToHome}
-          title="Voltar para o início"
-        />
-
-        {/* <Button
-          type={ButtonType.primary}
-          onPress={onGoToPaymentTypeChoice}
-          title="Voltar para concluir a venda"
-        /> */}
+        {totalAmountFromSplitPayment < totalAmountFee ? (
+          <Button
+            type={ButtonType.primary}
+            onPress={onGoToPaymentTypeChoice}
+            title="Voltar para concluir a venda"
+          />
+        ) : (
+          <Button
+            type={ButtonType.secondary}
+            onPress={onGoToHome}
+            title="Voltar para o início"
+          />
+        )}
       </View>
     </React.Fragment>
   );
@@ -139,7 +148,7 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
                 styles.spacingBottom,
                 styles.textUppercase,
               ]}>
-              {errorPayment || statusPayment}
+              {errorOrderSave || errorPayment || statusPayment}
             </Text>
 
             <View style={styles.selfCenter}>
@@ -152,6 +161,8 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
                   [States.cancelled]: nfcIcon,
                   [States.awaiting_credit_card]: nfcIcon,
                   [States.generic_error]: errorIcon,
+                  [States.order_save_loading]: processingIcon,
+                  [States.order_save_error]: errorIcon,
                 }[state]
               }
             </View>
@@ -165,12 +176,13 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
               weight={TextWeights.regular}
               align={TextAligns.center}
               style={styles.spacingTop}>
-              Valor a ser pago:{' '}
+              Valor da parcela:{' '}
               <Text
                 size={TextSizes.small}
                 weight={TextWeights.regular}
                 style={styles.bold}>
-                {installment.quantity}x {toString(installment.value)}
+                {installment.quantity}x{' '}
+                {toString(installment.value / installment.quantity)}
               </Text>
             </Text>
 
@@ -179,12 +191,12 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
               weight={TextWeights.regular}
               align={TextAligns.center}
               style={[styles.spacingTop, styles.spacingBottom]}>
-              Valor total sem juros:{' '}
+              Valor total:{' '}
               <Text
                 size={TextSizes.small}
                 weight={TextWeights.regular}
                 style={styles.bold}>
-                {toString(cart.totalAmount)}
+                {toString(installment.value)}
               </Text>
             </Text>
           </React.Fragment>
@@ -199,7 +211,6 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
               size={TextSizes.small}
               weight={TextWeights.regular}
               style={styles.bold}>
-              {/* {toString(cart.totalAmount)} */}
               {toString(installment.value)}
             </Text>
           </Text>
@@ -225,6 +236,16 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
           />
         </View>
       )}
+
+      {errorOrderSave && (
+        <View style={[styles.spacingContainer]}>
+          <Button
+            type={ButtonType.primary}
+            onPress={onRetryOrderSave}
+            title="Tentar novamente o envio do pedido"
+          />
+        </View>
+      )}
     </React.Fragment>
   );
 
@@ -239,6 +260,8 @@ export const PaymentByCreditCardUI: React.FC<PaymentByCreditCardUIProps> = ({
           [States.cancelled]: renderDefault,
           [States.awaiting_credit_card]: renderDefault,
           [States.generic_error]: renderDefault,
+          [States.order_save_loading]: renderDefault,
+          [States.order_save_error]: renderDefault,
           [States.finished]: renderSuccess,
         }[state]
       }

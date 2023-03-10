@@ -53,7 +53,9 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
   const handleOnDismiss = (value: boolean): void => setVisible(value);
 
   const handleOnPaymentTypeChoice = (): void => {
-    navigation.navigate(ROUTES.MainTab.Cart);
+    navigation.navigate(ROUTES.MainTab.Cart as any, {
+      screen: ROUTES.CartTabHome.PaymentCartInput,
+    });
   };
 
   const handleFetchCart = (): void => {

@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { NativeEventEmitter } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import { useBackHandler } from '@react-native-community/hooks';
 import { log } from 'src/util/log';
 import { useCart, removeAllItemFromCart } from 'src/redux/cartSlice';
+import { usePayments } from 'src/redux/paymentsSlice';
+import { useFees } from 'src/redux/feesSlice';
+import {
+  // updatePaymentStatusPaid,
+  removePayments,
+} from 'src/redux/paymentsSlice';
+// import { PaymentType } from 'src/model/paymentDTO';
+import { useAuth } from 'src/contexts/AuthContext/useAuth';
 import type { RootStackScreenProps } from 'src/navigation/RootStack';
 import {
   PaymentModule,
@@ -13,6 +21,11 @@ import {
 import { useSnackbar } from 'src/hooks/useSnackbar';
 import { PAYMENT_TYPES } from 'src/features/cart/types';
 import { ROUTES } from 'src/navigation/constants/routes';
+import { toString } from 'src/util/currency';
+import { calculateFees } from 'src/util/helpers';
+import { feeToNumber } from 'src/util/formatters';
+import { saveOrder } from 'src/features/cart/services';
+import { getErrorMessage } from 'src/services/request/errors';
 import {
   States,
   PaymentByCreditCardUI,
@@ -30,18 +43,52 @@ export const PaymentByCreditCardScreen: React.FC<
   PaymentByCreditCardScreenProps
 > = ({ navigation, route }) => {
   const installmentFromNavigation = route.params.installment;
+  // const uuid = route.params.uuid ?? null;
 
   const snackbar = useSnackbar();
   const dispatch = useDispatch();
   const cart = useSelector(useCart);
+  const splitPayments = useSelector(usePayments);
+  const { maximumFee } = useSelector(useFees);
+  const { token } = useAuth();
+
+  const totalAmountFee = calculateFees(
+    feeToNumber(cart.totalAmount),
+    feeToNumber(maximumFee?.administrateTax),
+  );
+
+  console.log('cart items >>> ', JSON.stringify(cart.items));
+  console.log('splitPayments items >>> ', splitPayments.items);
+
+  console.log(
+    'splitPayments total amount >>> ',
+    toString(splitPayments.totalAmount / 100),
+  );
+  console.log('cart total amount >>> ', toString(totalAmountFee));
+
   const [state, setState] = useState(States.awaiting_credit_card);
   const [statusPayment, setStatusPayment] = useState<string | null>(
     'AGUARDE...',
   );
   const [isAvailableAbort, setIsAvailableAbort] = useState(false);
   const [errorPayment, setErrorPayment] = useState<string | null>(null);
+  const [errorOrderSave, setErrorOrderSave] = useState<string | null>(null);
   const [codePin, setCodePin] = useState<string | null>(null);
   const eventEmitter = new NativeEventEmitter(PaymentModule);
+
+  const handleOnSubmitOrder = async (): Promise<void> => {
+    setState(States.order_save_loading);
+    setStatusPayment('AGUARDE...FINALIZANDO SUA COMPRA');
+    setErrorOrderSave(null);
+
+    try {
+      await saveOrder(token);
+      setState(States.finished);
+    } catch (error) {
+      setErrorOrderSave(getErrorMessage(error));
+      setState(States.order_save_error);
+    }
+  };
 
   const handleOnStartPayment = async (): Promise<void> => {
     const response = await startPayment(
@@ -64,11 +111,14 @@ export const PaymentByCreditCardScreen: React.FC<
 
   const handleOnGoToPaymentTypeChoice = (): void => {
     // call on action to decrement the quantity and value of the item
-    navigation.popToTop();
+    navigation.navigate(ROUTES.CartTabHome.PaymentCartInput as any, {
+      mustClearInputAmount: true,
+    });
   };
 
   const handleOnGoToHome = (): void => {
     dispatch(removeAllItemFromCart());
+    dispatch(removePayments());
 
     navigation.reset({
       index: 0,
@@ -80,11 +130,11 @@ export const PaymentByCreditCardScreen: React.FC<
     abortPayment();
   };
 
-  useEffect(() => {
-    new Promise(resolve => setTimeout(resolve, 500)).then(async () => {
-      handleOnStartPayment();
-    });
-  }, []);
+  // useEffect(() => {
+  //   new Promise(resolve => setTimeout(resolve, 500)).then(async () => {
+  //     handleOnStartPayment();
+  //   });
+  // }, []);
 
   useEffect(() => {
     if (state === States.finished) {
@@ -126,7 +176,15 @@ export const PaymentByCreditCardScreen: React.FC<
         if (code) {
           setCodePin(null);
           setIsAvailableAbort(false);
-          setState(States.finished);
+          // dispatch(
+          //   updatePaymentStatusPaid({
+          //     hash: uuid,
+          //     amountPaid: installmentFromNavigation.value * 100,
+          //     type: PaymentType.CREDIT_CARD,
+          //   }),
+          // );
+
+          handleOnSubmitOrder();
         }
       },
     );
@@ -222,16 +280,19 @@ export const PaymentByCreditCardScreen: React.FC<
   return (
     <PaymentByCreditCardUI
       state={state}
-      cart={cart}
+      totalAmountFromSplitPayment={splitPayments.totalAmount / 100}
+      totalAmountFee={totalAmountFee}
       installment={installmentFromNavigation}
       statusPayment={statusPayment}
       errorPayment={errorPayment}
       codePin={codePin}
       isAvailableAbort={isAvailableAbort}
+      errorOrderSave={errorOrderSave}
       onRetryPayment={handleOnRetryPayment}
       onGoToHome={handleOnGoToHome}
       onCancel={handleOnCancel}
       onGoToPaymentTypeChoice={handleOnGoToPaymentTypeChoice}
+      onRetryOrderSave={handleOnSubmitOrder}
     />
   );
 };

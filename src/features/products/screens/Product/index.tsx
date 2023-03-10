@@ -50,7 +50,9 @@ export const ProductScreen: React.FC<ProductScreenProps> = ({
   const handleOnDismiss = (value: boolean): void => setVisible(value);
 
   const handleOnPaymentTypeChoice = (): void => {
-    navigation.navigate(ROUTES.MainTab.Cart as any);
+    navigation.navigate(ROUTES.MainTab.Cart as any, {
+      screen: ROUTES.CartTabHome.PaymentCartInput,
+    });
   };
 
   const handleFetchCart = (): void => {

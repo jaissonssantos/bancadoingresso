@@ -3,6 +3,8 @@ import eventsReducer from './eventsSlice';
 import productsReducer from './productsSlice';
 import cartReducer from './cartSlice';
 import feesReducer from './feesSlice';
+import paymentsReducer from './paymentsSlice';
+import pinpadReducer from './pinpadSlice';
 
 const createDebugger = require('redux-flipper').default;
 
@@ -12,6 +14,8 @@ export const store = configureStore({
     events: eventsReducer,
     products: productsReducer,
     fees: feesReducer,
+    payments: paymentsReducer,
+    pinpad: pinpadReducer,
   },
   middleware: getDefaultMiddleware =>
     __DEV__

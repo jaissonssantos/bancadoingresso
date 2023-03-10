@@ -5,10 +5,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
 
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagActivationData;
@@ -33,19 +35,35 @@ public class AuthenticationModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void isAuthenticated(Promise promise) {
-        Log.i(TAG, "serial number: " + String.valueOf(Build.SERIAL));
-        // enviar um event para adicionar no storage do lado RN
+        try {
+            Boolean isAuth = mPlugPag.isAuthenticated();
 
-        promise.resolve(mPlugPag.isAuthenticated());
+            WritableMap params = Arguments.createMap();
+            params.putBoolean("enabled", isAuth);
+
+            if(isAuth) {
+                params.putString("id", String.valueOf(Build.ID));
+                params.putString("terminalSerialNumber", String.valueOf(Build.SERIAL));
+            } else {
+                params.putNull("id");
+                params.putNull("terminalSerialNumber");
+            }
+
+            Log.i(TAG, "serial number: " + String.valueOf(Build.SERIAL));
+
+            promise.resolve(params);
+        } catch (Exception e) {
+            promise.reject(e.getMessage());
+        }
     };
 
     @ReactMethod
-    public void initializeAndActivatePinpad(String activationCode, Promise promise) {
+    public void initializeAndActivatePinPad(String activationCode, Promise promise) {
         try {
             PlugPagInitializationResult result = mPlugPag.initializeAndActivatePinpad(new PlugPagActivationData(activationCode));
 
             if (result.getResult() == PlugPag.RET_OK) {
-                Log.i(TAG, "Call initializeAndActivatePinpad success");
+                Log.i(TAG, "Call initializeAndActivatePinPad success");
                 promise.resolve(result.getResult());
             } else {
                 promise.reject(new PlugPagException(result.getErrorMessage()));

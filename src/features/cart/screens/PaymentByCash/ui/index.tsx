@@ -5,8 +5,7 @@ import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
 import { Button } from 'src/components/Button';
 import { Dialog } from 'src/components/Dialog';
 import { BottomSheetReceipt } from 'src/components/BottomSheetReceipt';
-import { SuccessIcon, IconSizes } from 'src/assets/icons';
-import type { ICartState } from 'src/redux/cartSlice';
+import { SuccessIcon, ErrorIcon, IconSizes } from 'src/assets/icons';
 import { toString } from 'src/util/currency';
 import { Colors } from 'src/styleguide/colors';
 import { styles } from './styles';
@@ -14,25 +13,28 @@ import { styles } from './styles';
 export enum States {
   loading = 'loading',
   success = 'success',
+  error = 'error',
   finished = 'finished',
 }
 
 interface PaymentByCashUIProps {
-  cart: ICartState;
+  totalAmountFee: number;
   amount: number;
   state: States;
   visible: boolean;
   onPaymentFinish: () => void;
   onClose: () => void;
+  onRetry: () => void;
 }
 
 export const PaymentByCashUI: React.FC<PaymentByCashUIProps> = ({
-  cart,
+  totalAmountFee,
   amount,
   visible,
   state,
   onPaymentFinish,
   onClose,
+  onRetry,
 }) => {
   const renderLoading = (): ReactElement => (
     <React.Fragment>
@@ -54,6 +56,18 @@ export const PaymentByCashUI: React.FC<PaymentByCashUIProps> = ({
         weight={TextWeights.bold}
         style={[styles.title, styles.spacingTop]}>
         Pagamento realizado
+      </Text>
+    </React.Fragment>
+  );
+
+  const renderError = (): ReactElement => (
+    <React.Fragment>
+      <ErrorIcon size={IconSizes.xxmedium} fill={Colors.white} />
+      <Text
+        size={TextSizes.medium}
+        weight={TextWeights.bold}
+        style={[styles.title, styles.spacingTop]}>
+        Ocorreu um erro ao salvar o pedido
       </Text>
     </React.Fragment>
   );
@@ -93,17 +107,13 @@ export const PaymentByCashUI: React.FC<PaymentByCashUIProps> = ({
               weight={TextWeights.medium}
               align={TextAligns.center}
               style={styles.spacingTop}>
-              {toString(amount - cart.totalAmount)}
+              {toString(amount - totalAmountFee)}
             </Text>
           </View>
         </View>
 
         <View style={styles.containerButton}>
-          <Button
-            title="Finalizar pedido"
-            disabled={cart.totalQuantity === 0}
-            onPress={onPaymentFinish}
-          />
+          <Button title="Finalizar pedido" onPress={onPaymentFinish} />
         </View>
       </SafeAreaView>
 
@@ -116,12 +126,22 @@ export const PaymentByCashUI: React.FC<PaymentByCashUIProps> = ({
               {
                 [States.loading]: renderLoading(),
                 [States.success]: renderSuccess(),
+                [States.error]: renderError(),
                 [States.finished]: null,
               }[state]
             }
           </View>
         }
-        actions={[]}
+        actions={
+          state === States.error
+            ? [
+                {
+                  title: 'Tentar novamente',
+                  onPress: onRetry,
+                },
+              ]
+            : []
+        }
       />
 
       <BottomSheetReceipt

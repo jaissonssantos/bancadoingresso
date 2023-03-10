@@ -33,6 +33,9 @@ const styles = StyleSheet.create({
     borderRadius: scale(6),
     margin: verticalScale(6),
   },
+  disabled: {
+    opacity: 0.3,
+  },
   title: {
     fontWeight: 'bold',
   },
