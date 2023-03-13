@@ -36,17 +36,19 @@ export const formatPaymentPayload = (
   terminalSerialNumber: string | null,
   cart: ICartState,
   orders: OrderPayment[],
+  totalAmountFee: number,
+  totalAmountFeeWithPayment: number,
   paymentType: PAYMENT_TYPES = PAYMENT_TYPES.TYPE_CASH,
 ): Order => {
-  const { items } = cart;
+  const { items, totalAmount } = cart;
 
   const order: Order = {
     tickets: [],
     onlineSale: true,
-    amountItens: 0,
-    totalValue: 0,
-    totalValueWithFee: 0,
-    totalValueWithPaymentFee: 0,
+    amountItens: items.length,
+    totalValue: totalAmount,
+    totalValueWithFee: totalAmountFee,
+    totalValueWithPaymentFee: totalAmountFeeWithPayment,
     payments: [],
   };
 

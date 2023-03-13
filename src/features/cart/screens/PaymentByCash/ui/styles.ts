@@ -54,6 +54,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  secondaryButton: {
+    backgroundColor: Colors.white,
+  },
+  textBlack: {
+    color: Colors.black,
+  },
 });
 
 export { styles };

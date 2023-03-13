@@ -4,12 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useBackHandler } from '@react-native-community/hooks';
 import { log } from 'src/util/log';
 import { useCart, removeAllItemFromCart } from 'src/redux/cartSlice';
-import { usePayments } from 'src/redux/paymentsSlice';
-import { useFees } from 'src/redux/feesSlice';
 import {
-  // updatePaymentStatusPaid,
+  usePayments,
   removePayments,
+  // updatePaymentStatusPaid
 } from 'src/redux/paymentsSlice';
+import { useFees } from 'src/redux/feesSlice';
+import { usePinpad } from 'src/redux/pinpadSlice';
 // import { PaymentType } from 'src/model/paymentDTO';
 import { useAuth } from 'src/contexts/AuthContext/useAuth';
 import type { RootStackScreenProps } from 'src/navigation/RootStack';
@@ -19,12 +20,13 @@ import {
   abortPayment,
 } from 'src/core/native_modules/payment';
 import { useSnackbar } from 'src/hooks/useSnackbar';
-import { PAYMENT_TYPES } from 'src/features/cart/types';
+import { PAYMENT_TYPES, OrderPayment } from 'src/features/cart/types';
 import { ROUTES } from 'src/navigation/constants/routes';
 import { toString } from 'src/util/currency';
 import { calculateFees } from 'src/util/helpers';
 import { feeToNumber } from 'src/util/formatters';
 import { saveOrder } from 'src/features/cart/services';
+import { formatPaymentPayload } from 'src/features/cart/utils';
 import { getErrorMessage } from 'src/services/request/errors';
 import {
   States,
@@ -50,6 +52,7 @@ export const PaymentByCreditCardScreen: React.FC<
   const cart = useSelector(useCart);
   const splitPayments = useSelector(usePayments);
   const { maximumFee } = useSelector(useFees);
+  const { terminalSerialNumber } = useSelector(usePinpad);
   const { token } = useAuth();
 
   const totalAmountFee = calculateFees(
@@ -72,17 +75,27 @@ export const PaymentByCreditCardScreen: React.FC<
   );
   const [isAvailableAbort, setIsAvailableAbort] = useState(false);
   const [errorPayment, setErrorPayment] = useState<string | null>(null);
+  const [ordersPayment, setOrdersPayment] = useState<OrderPayment[]>([]);
   const [errorOrderSave, setErrorOrderSave] = useState<string | null>(null);
   const [codePin, setCodePin] = useState<string | null>(null);
   const eventEmitter = new NativeEventEmitter(PaymentModule);
 
-  const handleOnSubmitOrder = async (): Promise<void> => {
+  const handleOnSubmitOrder = async (orders: OrderPayment[]): Promise<void> => {
     setState(States.order_save_loading);
     setStatusPayment('AGUARDE...FINALIZANDO SUA COMPRA');
     setErrorOrderSave(null);
 
     try {
-      await saveOrder(token);
+      await saveOrder(
+        token,
+        formatPaymentPayload(
+          terminalSerialNumber,
+          cart,
+          orders,
+          totalAmountFee,
+          installmentFromNavigation.value * 100,
+        ),
+      );
       setState(States.finished);
     } catch (error) {
       setErrorOrderSave(getErrorMessage(error));
@@ -105,6 +118,7 @@ export const PaymentByCreditCardScreen: React.FC<
     setStatusPayment('AGUARDE...');
     setErrorPayment(null);
     setCodePin(null);
+    setErrorOrderSave(null);
 
     handleOnStartPayment();
   };
@@ -130,11 +144,11 @@ export const PaymentByCreditCardScreen: React.FC<
     abortPayment();
   };
 
-  // useEffect(() => {
-  //   new Promise(resolve => setTimeout(resolve, 500)).then(async () => {
-  //     handleOnStartPayment();
-  //   });
-  // }, []);
+  useEffect(() => {
+    new Promise(resolve => setTimeout(resolve, 500)).then(async () => {
+      handleOnStartPayment();
+    });
+  }, []);
 
   useEffect(() => {
     if (state === States.finished) {
@@ -170,10 +184,12 @@ export const PaymentByCreditCardScreen: React.FC<
 
     const eventPaymentSuccessListener = eventEmitter.addListener(
       'eventSuccessPayment',
-      ({ code, message }: PaymentByCreditCardEventListener): void => {
-        log.i(`Success do payment: ${code} | ${message}`);
+      (orderPayment: PaymentByCreditCardEventListener): void => {
+        log.i(
+          `Success do payment: ${orderPayment.transactionId} | ${orderPayment.message}`,
+        );
 
-        if (code) {
+        if (orderPayment.transactionCode) {
           setCodePin(null);
           setIsAvailableAbort(false);
           // dispatch(
@@ -183,8 +199,15 @@ export const PaymentByCreditCardScreen: React.FC<
           //     type: PaymentType.CREDIT_CARD,
           //   }),
           // );
+          const payload = [
+            {
+              ...orderPayment,
+              installments: `${installmentFromNavigation.quantity}`,
+            },
+          ];
 
-          handleOnSubmitOrder();
+          setOrdersPayment(payload);
+          handleOnSubmitOrder(payload);
         }
       },
     );
@@ -198,7 +221,7 @@ export const PaymentByCreditCardScreen: React.FC<
 
         setCodePin(null);
         setIsAvailableAbort(false);
-        setErrorPayment(message);
+        setErrorPayment(message!);
       },
     );
 
@@ -206,7 +229,7 @@ export const PaymentByCreditCardScreen: React.FC<
       'eventPasswordToPayment',
       ({ code, message }: PaymentByCreditCardEventListener): void => {
         if (code) {
-          setCodePin(message);
+          setCodePin(message!);
         }
       },
     );
@@ -233,7 +256,7 @@ export const PaymentByCreditCardScreen: React.FC<
       'eventPrintSuccess',
       ({ message }: PrintSuccessEventListener): void => {
         snackbar.show({
-          message,
+          message: message!,
           type: 'success',
         });
       },
@@ -243,7 +266,7 @@ export const PaymentByCreditCardScreen: React.FC<
       'eventPrintError',
       ({ message }: PrintErrorEventListener): void => {
         snackbar.show({
-          message,
+          message: message!,
           type: 'danger',
         });
       },
@@ -292,7 +315,7 @@ export const PaymentByCreditCardScreen: React.FC<
       onGoToHome={handleOnGoToHome}
       onCancel={handleOnCancel}
       onGoToPaymentTypeChoice={handleOnGoToPaymentTypeChoice}
-      onRetryOrderSave={handleOnSubmitOrder}
+      onRetryOrderSave={(): Promise<void> => handleOnSubmitOrder(ordersPayment)}
     />
   );
 };

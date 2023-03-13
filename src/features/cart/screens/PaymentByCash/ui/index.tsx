@@ -24,6 +24,7 @@ interface PaymentByCashUIProps {
   visible: boolean;
   onPaymentFinish: () => void;
   onClose: () => void;
+  onDismiss: () => void;
   onRetry: () => void;
 }
 
@@ -34,6 +35,7 @@ export const PaymentByCashUI: React.FC<PaymentByCashUIProps> = ({
   state,
   onPaymentFinish,
   onClose,
+  onDismiss,
   onRetry,
 }) => {
   const renderLoading = (): ReactElement => (
@@ -138,6 +140,12 @@ export const PaymentByCashUI: React.FC<PaymentByCashUIProps> = ({
                 {
                   title: 'Tentar novamente',
                   onPress: onRetry,
+                },
+                {
+                  title: 'Fechar',
+                  onPress: onDismiss,
+                  buttonStyle: styles.secondaryButton,
+                  titleStyle: styles.textBlack,
                 },
               ]
             : []

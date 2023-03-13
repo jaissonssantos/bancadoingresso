@@ -52,7 +52,7 @@ export const PaymentTypeChoiceScreen: React.FC<
 
   const handleOnDebitCardPress = (): void =>
     navigation.navigate(ROUTES.Payments.PaymentByDebitCard, {
-      amount: totalAmountFee,
+      amount: debitCardFee,
       uuid,
     });
 

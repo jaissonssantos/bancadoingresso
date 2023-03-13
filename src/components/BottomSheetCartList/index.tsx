@@ -34,12 +34,14 @@ import styles from './styles';
 
 interface BottomSheetCartListProps {
   visible: boolean;
+  eventId?: string;
   onDismiss?: (value: boolean) => void;
   onContinue: () => void;
 }
 
 export const BottomSheetCartList: React.FC<BottomSheetCartListProps> = ({
   visible,
+  eventId,
   onDismiss,
   onContinue,
 }) => {
@@ -61,7 +63,12 @@ export const BottomSheetCartList: React.FC<BottomSheetCartListProps> = ({
   }, []);
 
   const handleOnAddProduct = (product: IProduct): void => {
-    dispatch(addItemToCart(product));
+    dispatch(
+      addItemToCart({
+        ...product,
+        eventId,
+      }),
+    );
   };
 
   const handleOnSubtractProduct = (product: IProduct): void => {

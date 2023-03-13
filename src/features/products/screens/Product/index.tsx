@@ -40,7 +40,12 @@ export const ProductScreen: React.FC<ProductScreenProps> = ({
   const handleOnGoToCart = (): void => setVisible(!visible);
 
   const handleOnAddProduct = (product: IProduct): void => {
-    dispatch(addItemToCart(product));
+    dispatch(
+      addItemToCart({
+        ...product,
+        eventId: subGroupDataFromNavigation.event?.id,
+      }),
+    );
   };
 
   const handleOnSubtractProduct = (product: IProduct): void => {
@@ -138,6 +143,7 @@ export const ProductScreen: React.FC<ProductScreenProps> = ({
       status={status}
       cart={cart}
       visible={visible}
+      event={subGroupDataFromNavigation.event}
       subGroupData={subGroupData}
       formData={formData}
       onChangeInput={onChangeInput}

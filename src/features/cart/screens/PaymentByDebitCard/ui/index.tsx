@@ -3,10 +3,10 @@ import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
 import { SuccessIcon, IconSizes, NFCIcon, ErrorIcon } from 'src/assets/icons';
-import type { ICartState } from 'src/redux/cartSlice';
 import { toString } from 'src/util/currency';
 import { Colors } from 'src/styleguide/colors';
 import { Button, ButtonType } from 'src/components/Button';
+import type { OrderPayment } from 'src/features/cart/types';
 import { styles } from './styles';
 
 export enum States {
@@ -17,12 +17,14 @@ export enum States {
   error = 'error',
   generic_error = 'generic_error',
   cancelled = 'cancelled',
+  order_save_loading = 'order_save_loading',
+  order_save_error = 'order_save_error',
   finished = 'finished',
 }
 
-export interface PaymentByDebitCardEventListener {
-  code: number | null;
-  message: string;
+export interface PaymentByDebitCardEventListener extends OrderPayment {
+  code?: number | null;
+  message?: string;
 }
 
 export interface PinCodePinRequestedEventListener {
@@ -41,30 +43,36 @@ export interface PrintErrorEventListener
 
 interface PaymentByDebitCardUIProps {
   state: States;
-  cart: ICartState;
-  amount: number;
+  totalAmountFromSplitPayment: number;
+  totalAmountFee: number;
+  totalAmountToPay: number;
   statusPayment: string | null;
   errorPayment: string | null;
   codePin: string | null;
   isAvailableAbort: boolean;
+  errorOrderSave: string | null;
   onRetryPayment: () => void;
   onGoToHome: () => void;
   onCancel: () => void;
   onGoToPaymentTypeChoice: () => void;
+  onRetryOrderSave: () => void;
 }
 
 export const PaymentByDebitCardUI: React.FC<PaymentByDebitCardUIProps> = ({
   state,
-  cart,
-  amount,
+  totalAmountFromSplitPayment,
+  totalAmountFee,
+  totalAmountToPay,
   statusPayment,
   errorPayment,
   codePin,
   isAvailableAbort,
+  errorOrderSave,
   onRetryPayment,
   onGoToHome,
-  onGoToPaymentTypeChoice,
   onCancel,
+  onGoToPaymentTypeChoice,
+  onRetryOrderSave,
 }) => {
   const nfcIcon = <NFCIcon size={IconSizes.medium} fill={Colors.white} />;
   const errorIcon = (
@@ -89,17 +97,19 @@ export const PaymentByDebitCardUI: React.FC<PaymentByDebitCardUIProps> = ({
         </Text>
       </View>
       <View style={[styles.spacingContainer]}>
-        <Button
-          type={ButtonType.secondary}
-          onPress={onGoToHome}
-          title="Voltar para o início"
-        />
-
-        {/* <Button
-          type={ButtonType.primary}
-          onPress={onGoToPaymentTypeChoice}
-          title="Voltar para concluir a venda"
-        /> */}
+        {totalAmountFromSplitPayment < totalAmountFee ? (
+          <Button
+            type={ButtonType.primary}
+            onPress={onGoToPaymentTypeChoice}
+            title="Voltar para concluir a venda"
+          />
+        ) : (
+          <Button
+            type={ButtonType.secondary}
+            onPress={onGoToHome}
+            title="Voltar para o início"
+          />
+        )}
       </View>
     </React.Fragment>
   );
@@ -138,7 +148,7 @@ export const PaymentByDebitCardUI: React.FC<PaymentByDebitCardUIProps> = ({
                 styles.spacingBottom,
                 styles.textUppercase,
               ]}>
-              {errorPayment || statusPayment}
+              {errorOrderSave || errorPayment || statusPayment}
             </Text>
 
             <View style={styles.selfCenter}>
@@ -151,6 +161,8 @@ export const PaymentByDebitCardUI: React.FC<PaymentByDebitCardUIProps> = ({
                   [States.cancelled]: nfcIcon,
                   [States.awaiting_credit_card]: nfcIcon,
                   [States.generic_error]: errorIcon,
+                  [States.order_save_loading]: processingIcon,
+                  [States.order_save_error]: errorIcon,
                 }[state]
               }
             </View>
@@ -167,8 +179,7 @@ export const PaymentByDebitCardUI: React.FC<PaymentByDebitCardUIProps> = ({
             size={TextSizes.small}
             weight={TextWeights.regular}
             style={styles.bold}>
-            {/* {toString(cart.totalAmount)} */}
-            {toString(amount)}
+            {toString(totalAmountToPay)}
           </Text>
         </Text>
       </View>
@@ -192,6 +203,16 @@ export const PaymentByDebitCardUI: React.FC<PaymentByDebitCardUIProps> = ({
           />
         </View>
       )}
+
+      {errorOrderSave && !isAvailableAbort && (
+        <View style={[styles.spacingContainer]}>
+          <Button
+            type={ButtonType.primary}
+            onPress={onRetryOrderSave}
+            title="Tentar novamente o envio do pedido"
+          />
+        </View>
+      )}
     </React.Fragment>
   );
 
@@ -206,6 +227,8 @@ export const PaymentByDebitCardUI: React.FC<PaymentByDebitCardUIProps> = ({
           [States.cancelled]: renderDefault,
           [States.awaiting_credit_card]: renderDefault,
           [States.generic_error]: renderDefault,
+          [States.order_save_loading]: renderDefault,
+          [States.order_save_error]: renderDefault,
           [States.finished]: renderSuccess,
         }[state]
       }

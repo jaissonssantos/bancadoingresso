@@ -7,6 +7,7 @@ import { toString } from 'src/util/currency';
 import { Colors } from 'src/styleguide/colors';
 import { Button, ButtonType } from 'src/components/Button';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
+import type { OrderPayment } from 'src/features/cart/types';
 import { styles } from './styles';
 
 export enum States {
@@ -22,9 +23,9 @@ export enum States {
   finished = 'finished',
 }
 
-export interface PaymentByCreditCardEventListener {
-  code: number | null;
-  message: string;
+export interface PaymentByCreditCardEventListener extends OrderPayment {
+  code?: number | null;
+  message?: string;
 }
 
 export interface PinCodePinRequestedEventListener {

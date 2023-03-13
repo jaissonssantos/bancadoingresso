@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import base64 from 'react-native-base64';
 import { useAuth } from 'src/contexts/AuthContext/useAuth';
 import { useBottomSheet } from 'src/contexts/BottomSheetContext/useBottomSheet';
+import { useSelector } from 'react-redux';
 import type { RootStackScreenProps } from 'src/navigation/RootStack';
 import { getErrorMessage } from 'src/services/request/errors';
 import { useForm } from 'src/hooks/useForm';
 import * as validators from 'src/util/validators';
 import * as cpf from 'src/util/cpf';
 import { requestLogin } from 'src/features/auth/services';
+import { usePinpad } from 'src/redux/pinpadSlice';
 import { LoginUI, LoginUIStates, LoginFormData } from './ui';
 
 type LoginScreenProps = RootStackScreenProps<'Auth.Login'>;
@@ -15,6 +17,7 @@ type LoginScreenProps = RootStackScreenProps<'Auth.Login'>;
 export const LoginScreen: React.FC<LoginScreenProps> = () => {
   const [state, setState] = useState(LoginUIStates.default);
   const [isShouldPassword, setIsShouldPassword] = useState(false);
+  const { terminalSerialNumber } = useSelector(usePinpad);
 
   const bottomSheet = useBottomSheet();
   const { updateAuthState } = useAuth();
@@ -47,6 +50,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
       const response = await requestLogin({
         grant_type: 'client_credentials',
         auth_header: authHeader,
+        serial: terminalSerialNumber!,
       });
 
       // It'll navigate automatically

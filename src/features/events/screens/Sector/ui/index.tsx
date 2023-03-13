@@ -100,6 +100,7 @@ export const SectorUI: React.FC<SectorUIProps> = ({
     )}
 
     <BottomSheetCartList
+      eventId={sectorData.event?.id}
       visible={visible}
       onDismiss={onDismiss}
       onContinue={onPaymentTypeChoice}

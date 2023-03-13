@@ -12,6 +12,7 @@ import { useAuth } from 'src/contexts/AuthContext/useAuth';
 import type { OrderPayment } from 'src/features/cart/types';
 import { saveOrder } from 'src/features/cart/services';
 import { PaymentByCashUI, States } from './ui';
+import { ROUTES } from 'src/navigation/constants/routes';
 
 type PaymentByCashScreenProps =
   CartStackScreenProps<'CartTabHome.PaymentByCash'>;
@@ -27,8 +28,6 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
   const { maximumFee } = useSelector(useFees);
   const { terminalSerialNumber } = useSelector(usePinpad);
   const { token } = useAuth();
-
-  console.log('terminalSerialNumber >>> ', terminalSerialNumber);
 
   const amount = route.params.amount || 0;
 
@@ -48,14 +47,26 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
       console.log(
         'payload >>> ',
         JSON.stringify(
-          formatPaymentPayload(terminalSerialNumber, cart, orders),
+          formatPaymentPayload(
+            terminalSerialNumber,
+            cart,
+            orders,
+            totalAmountFee,
+            totalAmountFee,
+          ),
         ),
       );
       await saveOrder(
         token,
-        formatPaymentPayload(terminalSerialNumber, cart, orders),
+        formatPaymentPayload(
+          terminalSerialNumber,
+          cart,
+          orders,
+          totalAmountFee,
+          totalAmountFee,
+        ),
       );
-      setState(States.loading);
+      setState(States.success);
     } catch (error) {
       setState(States.error);
       console.log(error);
@@ -63,15 +74,20 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
   };
 
   const handleOnClose = (): void => {
-    navigation.navigate('CartTabHome.itself');
     dispatch(removeAllItemFromCart());
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: ROUTES.MainTab.Itself as any }],
+    });
   };
 
   useEffect(() => {
     if (state === States.success) {
-      new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
+      new Promise(resolve => setTimeout(resolve, 2000)).then(() => {
         setVisible(false);
-        setState(States.finished);
+        handleOnClose();
+        // setState(States.finished);
       });
     }
   }, [state]);
@@ -88,6 +104,7 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
       visible={visible}
       onPaymentFinish={handleOnPaymentFinish}
       onClose={handleOnClose}
+      onDismiss={(): void => setVisible(!visible)}
       onRetry={handleOnPaymentFinish}
     />
   );

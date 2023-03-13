@@ -14,6 +14,7 @@ import { Skeleton } from 'src/components/Skeleton';
 import { toString } from 'src/util/currency';
 import { IProductStatus, IProductStatusType } from 'src/redux/productsSlice';
 import type { ICartState } from 'src/redux/cartSlice';
+import type { IEvent } from 'src/model/eventDTO';
 import { styles } from './styles';
 
 export type SearchFormData = {
@@ -25,6 +26,7 @@ interface ProductUIProps
   status: IProductStatus;
   cart: ICartState;
   visible: boolean;
+  event?: IEvent;
   subGroupData: ISubGroups;
   onAddProduct: (product: IProduct) => void;
   onSubtractProduct: (product: IProduct) => void;
@@ -37,6 +39,7 @@ export const ProductUI: React.FC<ProductUIProps> = ({
   status,
   cart,
   visible,
+  event,
   subGroupData,
   formData,
   onChangeInput,
@@ -117,6 +120,7 @@ export const ProductUI: React.FC<ProductUIProps> = ({
       )}
 
       <BottomSheetCartList
+        eventId={event?.id}
         visible={visible}
         onDismiss={onDismiss}
         onContinue={onPaymentTypeChoice}

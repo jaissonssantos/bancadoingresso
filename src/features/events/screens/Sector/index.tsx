@@ -41,7 +41,12 @@ export const SectorScreen: React.FC<SectorScreenProps> = ({
   });
 
   const handleOnAddProduct = (product: IProduct): void => {
-    dispatch(addItemToCart(product));
+    dispatch(
+      addItemToCart({
+        ...product,
+        eventId: sectorDataFromNavigation.event?.id,
+      }),
+    );
   };
 
   const handleOnSubtractProduct = (product: IProduct): void => {

@@ -266,7 +266,41 @@ public class PaymentModule extends ReactContextBaseJavaModule {
     private WritableMap createObjectToEventSuccessPayment(PlugPagTransactionResult transactionResult) {
         WritableMap params = Arguments.createMap();
         params.putString("message", transactionResult.getMessage());
-        params.putString("code", transactionResult.getTransactionCode());
+        params.putString("errorCode", transactionResult.getErrorCode());
+        params.putString("transactionCode", transactionResult.getTransactionCode());
+        params.putString("transactionId", transactionResult.getTransactionId());
+        params.putString("date", transactionResult.getDate());
+        params.putString("time", transactionResult.getTime());
+        params.putString("hostNsu", transactionResult.getHostNsu());
+        params.putString("cardBrand", transactionResult.getCardBrand());
+        params.putString("bind", transactionResult.getBin());
+        params.putString("holder", transactionResult.getHolder());
+        params.putString("userReference", transactionResult.getUserReference());
+        params.putString("terminalSerialNumber", transactionResult.getTerminalSerialNumber());
+        params.putString("amount", transactionResult.getAmount());
+        params.putString("availableBalance", transactionResult.getAvailableBalance());
+        params.putString("cardApplication", transactionResult.getCardApplication());
+        params.putString("label", transactionResult.getLabel());
+        params.putString("holderName", transactionResult.getHolderName());
+        params.putString("extendedHolderName", transactionResult.getExtendedHolderName());
+        params.putInt("result", transactionResult.getResult());
+        params.putString("readerModel", transactionResult.getReaderModel());
+        params.putString("nsu", transactionResult.getNsu());
+        params.putString("autoCode", transactionResult.getAutoCode());
+        params.putString("installments", transactionResult.getInstallments().toString());
+        params.putInt("originalAmount", transactionResult.getOriginalAmount());
+        params.putString("buyerName", transactionResult.getBuyerName());
+        params.putInt("paymentType", transactionResult.getPaymentType());
+        params.putString("typeTransaction", transactionResult.getTypeTransaction());
+        params.putString("appIdentification", transactionResult.getAppIdentification());
+        params.putString("cardHash", transactionResult.getCardHash());
+        params.putString("preAutoDueDate", transactionResult.getPreAutoDueDate());
+        params.putString("preAutoOriginalAmount", transactionResult.getPreAutoOriginalAmount());
+        params.putInt("userRegistered", transactionResult.getUserRegistered());
+        params.putString("accumulatedValue", transactionResult.getAccumulatedValue());
+        params.putString("dynamicListMsgData", transactionResult.getDynamicListMsgData());
+        params.putString("partialPayPartiallyAuthorizedAmount", transactionResult.getPartialPayPartiallyAuthorizedAmount());
+        params.putString("partialPayRemainingAmount", transactionResult.getPartialPayRemainingAmount());
 
         return params;
     }
