@@ -3,6 +3,7 @@ package com.app;
 import com.app.pagseguro.PaymentModule;
 import com.app.pagseguro.AuthenticationModule;
 
+import com.app.pagseguro.PrintModule;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.ReactNativeHost;
@@ -33,6 +34,7 @@ public class ReactNativePackages implements ReactPackage {
     List<NativeModule> modules = new ArrayList<>();
     modules.add(new AuthenticationModule(reactContext));
     modules.add(new PaymentModule(reactContext));
+    modules.add(new PrintModule(reactContext));
 
     if (BuildConfig.DEBUG) {
       // modules.add(new DevMenuManager(reactContext, mReactNativeHost));

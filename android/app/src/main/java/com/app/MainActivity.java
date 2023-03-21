@@ -1,10 +1,26 @@
 package com.app;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+
+import androidx.core.app.ActivityCompat;
+
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
 
 public class MainActivity extends ReactActivity {
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    if (checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, 0, 101) == PackageManager.PERMISSION_DENIED) {
+      requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},0);
+    }
+  }
+
+
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule

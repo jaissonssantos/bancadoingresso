@@ -4,6 +4,7 @@ interface EnvVariables extends NativeConfig {
   API_URL: string;
   ACTIVATION_CODE: string;
   USER_REFERENCE: string;
+  ENABLE_PINPAD: string;
 }
 
 export const Env = Config as EnvVariables;

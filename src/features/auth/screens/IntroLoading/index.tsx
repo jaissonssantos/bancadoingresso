@@ -84,7 +84,11 @@ export const IntroLoadingScreen: React.FC<IntroLoadingScreenProps> = ({
   };
 
   useEffect(() => {
-    handleAuthPagSeguro();
+    if (Env.ENABLE_PINPAD === 'true') {
+      handleAuthPagSeguro();
+    } else {
+      handleAuthState();
+    }
   }, []);
 
   return <IntroLoadingUI message={message} />;

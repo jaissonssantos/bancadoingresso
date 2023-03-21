@@ -47,10 +47,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
         `${formData.document}:${formData.password}`,
       )}`;
 
+      const serial = terminalSerialNumber || '1170217545';
+
       const response = await requestLogin({
         grant_type: 'client_credentials',
         auth_header: authHeader,
-        serial: terminalSerialNumber!,
+        serial,
       });
 
       // It'll navigate automatically

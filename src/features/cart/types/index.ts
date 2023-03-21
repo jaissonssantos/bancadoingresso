@@ -65,3 +65,44 @@ export interface Order {
   totalValueWithPaymentFee: number;
   payments: OrderPayment[];
 }
+
+export interface PrintTicket {
+  date: string;
+  transactionId: string;
+  eventId: string;
+  eventName: string;
+  ticketId?: string;
+  ticketName?: string;
+  halfPrice: boolean;
+  productId?: string;
+  productName?: string;
+  comboId?: string;
+  comboName?: string;
+  qrCodeEncrypted: string;
+  pdvName: string;
+  posName: string;
+  unitValue: number;
+  fee: number;
+  totalValue: number;
+  eventDate: string;
+  eventPlace: string;
+  eventCity: string;
+  eventUF: string;
+  paymentType: number;
+  sequence: number;
+}
+
+export interface OrderItemQrCode {
+  id: string;
+  userName?: string;
+  userCPF?: string;
+  eventId: string;
+  sectionId?: string;
+  ticketId?: string;
+  productId?: string;
+  comboId?: string;
+  unitValue: number;
+  orderDate: Date;
+  halfPrice?: boolean;
+  validated?: boolean;
+}

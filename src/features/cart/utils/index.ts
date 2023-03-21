@@ -1,8 +1,17 @@
+import CryptoJS from 'crypto-js';
 import { v4 as uuid } from 'uuid';
 import type { Installment } from 'src/features/cart/model/installmentDTO';
 import type { ICartState } from 'src/redux/cartSlice';
 import { calculateFees } from 'src/util/helpers';
-import { PAYMENT_TYPES, OrderPayment, Order, OrderTicket } from '../types';
+import {
+  PAYMENT_TYPES,
+  OrderPayment,
+  Order,
+  OrderTicket,
+  PrintTicket,
+  OrderItemQrCode,
+} from '../types';
+import dayjs from 'dayjs';
 
 export const getInstallments = (
   amount: number,
@@ -84,7 +93,6 @@ export const formatPaymentPayload = (
     if (orderPaymentType === paymentType) {
       order.payments.push({
         ...orderPayment,
-        paymentType: 0,
         terminalSerialNumber: terminalSerialNumber!,
       });
     } else {
@@ -93,4 +101,66 @@ export const formatPaymentPayload = (
   });
 
   return order;
+};
+
+const encrypt = (value: string): string => {
+  const keyString = '1@4&%nFTzuXiZAT^';
+  const ivString = 'Bar12345Bar12345';
+  const data = CryptoJS.enc.Utf8.parse(value);
+  const key = CryptoJS.enc.Utf8.parse(keyString);
+  const iv = CryptoJS.enc.Utf8.parse(ivString);
+
+  const encrypted = CryptoJS.AES.encrypt(data, key, {
+    padding: CryptoJS.pad.Pkcs7,
+    mode: CryptoJS.mode.ECB,
+    iv,
+  });
+  return encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+};
+
+export const formatPrintTicket = (
+  cart: ICartState,
+  orders: OrderPayment[],
+): PrintTicket[] => {
+  const list: PrintTicket[] = [];
+  let count = 1;
+
+  cart.items.forEach(data => {
+    const amount = data.amount || 1;
+    for (let i = 0; i < amount; i++) {
+      const orderItemQrCodeDTO: OrderItemQrCode = {
+        id: orders[0].transactionCode as string,
+        eventId: data.eventId as string,
+        ticketId: data.id,
+        unitValue: data.unitValue as number,
+        orderDate: new Date(),
+        halfPrice: data.isHalfPrice,
+      };
+
+      const ticket: PrintTicket = {
+        date: dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+        transactionId: orders[0].transactionCode as string,
+        eventId: data.eventId as string,
+        eventName: 'N/A',
+        ticketId: data.id,
+        ticketName: data.name,
+        halfPrice: data.isHalfPrice,
+        qrCodeEncrypted: encrypt(JSON.stringify(orderItemQrCodeDTO)),
+        pdvName: 'N/A',
+        posName: 'N/A',
+        unitValue: data.unitValue as number,
+        fee: data.fee as number,
+        totalValue: data.totalValue as number,
+        eventDate: dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+        eventPlace: 'N/A',
+        eventCity: 'N/A',
+        eventUF: 'N/A',
+        paymentType: orders[0].paymentType,
+        sequence: count,
+      };
+      count++;
+      list.push(ticket);
+    }
+  });
+  return list;
 };
