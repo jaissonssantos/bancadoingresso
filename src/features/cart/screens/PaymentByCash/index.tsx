@@ -26,6 +26,7 @@ export interface EventPrintListener {
   message: string;
   result: number;
   steps: number;
+  sequence: number;
 }
 
 type PaymentByCashScreenProps =
@@ -38,7 +39,7 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
   const [visible, setVisible] = useState(false);
   const [state, setState] = useState(States.loading);
   const [order, setOrder] = useState<Order>();
-  const [printTickets, setPrintTickets] = useState<PrintTicket[]>();
+  const [printTickets, setPrintTickets] = useState<PrintTicket[]>([]);
   const dispatch = useDispatch();
   const cart = useSelector(useCart);
   const { maximumFee } = useSelector(useFees);
@@ -80,9 +81,12 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
       );
       console.log('payload >>> ', JSON.stringify(formatedPayload));
       setOrder(formatedPayload);
+
       const formatedPrintTicket = formatPrintTicket(cart, orders);
-      log.e(`printTickets: ${JSON.stringify(formatedPrintTicket)}`);
+      console.log('formatedPrintTicket >>> ', formatedPrintTicket);
+
       setPrintTickets(formatedPrintTicket);
+
       await sendToPrint(formatedPrintTicket, 1);
     } catch (error) {
       setState(States.error);
@@ -113,11 +117,13 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
     const eventSuccessPrintListener = eventEmitter.addListener(
       'eventSuccessPrint',
       async (eventPrintListener: EventPrintListener): Promise<void> => {
-        log.i(
-          `Success do print: ${eventPrintListener.result} | ${eventPrintListener.message}`,
-        );
-        await saveOrder(token, order as Order);
-        setState(States.success);
+        log.i(`Success do print: ${JSON.stringify(eventPrintListener)}`);
+        log.i(`printTickets: ${printTickets.length}`);
+
+        if (eventPrintListener.sequence === printTickets?.length!) {
+          await saveOrder(token, order as Order);
+          setState(States.success);
+        }
       },
     );
 
@@ -127,7 +133,7 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
         log.e(
           `Error do print: ${eventPrintListener.result} | ${eventPrintListener.message}`,
         );
-        log.e(`printTickets: ${JSON.stringify(printTickets)}`);
+        log.e(`printTickets: ${JSON.stringify(printTickets.length)}`);
         await sendToPrint(
           printTickets as PrintTicket[],
           eventPrintListener.steps,
@@ -141,7 +147,7 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
       eventSuccessPrintListener.remove();
       eventErrorPrintListener.remove();
     };
-  }, []);
+  }, [printTickets]);
 
   useBackHandler(() => {
     return true;

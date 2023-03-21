@@ -14,10 +14,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class CreateTicket {
-    private final int WIDTH = 300;
-    private final int HEIGHT = 460;
-    private final int TEXT_SIZE_DEFAULT = 12;
-    private final int TEXT_SIZE_TITLE = 15;
+    private final int WIDTH = 500;
+    private final int HEIGHT = 700;
+    private final int TEXT_SIZE_DEFAULT = 18;
+    private final int TEXT_SIZE_TITLE = 22;
     public byte[] create(Ticket ticket, Integer amounttickets, String versionName, String appName) throws Exception{
         try {
             TextPaint tpDefault = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
@@ -32,6 +32,7 @@ public class CreateTicket {
 
             Bitmap bmp = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bmp);
+            canvas.drawColor(Color.WHITE);
 
             StaticLayout description = createStaticLayout("Essa Impressão não é responsabilidade da PagSeguro", tpDefault);
             description.draw(canvas);
@@ -39,20 +40,20 @@ public class CreateTicket {
 
             StaticLayout date = createStaticLayout(mountDateText(ticket.getDate(), appName, versionName), tpDefault);
             date.draw(canvas);
-            canvas.translate(0, 13);
+            canvas.translate(0, 20);
 
             StaticLayout transaction = createStaticLayout(ticket.getTransactionId(), tpDefault);
             transaction.draw(canvas);
-            canvas.translate(0, 13);
+            canvas.translate(0, 20);
 
             QrCode qrCode = new QrCode();
             Bitmap bitmap = qrCode.create(ticket.getQrCodeEncrypted());
-            canvas.drawBitmap(bitmap, 50, 0, null);
+            canvas.drawBitmap(bitmap, 100, 0, null);
 
-            canvas.translate(0, 190);
+            canvas.translate(0, 290);
             StaticLayout posName = createStaticLayout(ticket.getPosName(), tpTitle);
             posName.draw(canvas);
-            canvas.translate(0, 16);
+            canvas.translate(0, 25);
 
             if (ticket.getTicketId() != null && ticket.getTicketId().trim().length() > 0) {
                 StaticLayout ticketName = createStaticLayout(ticket.getTicketName(), tpTitle);
@@ -72,12 +73,12 @@ public class CreateTicket {
             String valueString = "Valor: R$ " + df.format(ticket.getUnitValue());
             StaticLayout value = createStaticLayout(valueString, tpDefault);
             value.draw(canvas);
-            canvas.translate(0, 13);
+            canvas.translate(0, 20);
 
             String feeString = "Taxas: R$ " + df.format(ticket.getUnitValue().multiply(ticket.getFee()).subtract(ticket.getUnitValue()));
             StaticLayout fee = createStaticLayout(feeString, tpDefault);
             fee.draw(canvas);
-            canvas.translate(0, 13);
+            canvas.translate(0, 20);
 
             String totalString = "Total: R$ " + df.format(ticket.getUnitValue().multiply(ticket.getFee()));
             StaticLayout total = createStaticLayout(totalString, tpDefault);
@@ -88,16 +89,16 @@ public class CreateTicket {
             String eventDateString = "Inicio: " + sdf.format(ticket.getEventDate());
             StaticLayout eventDate = createStaticLayout(eventDateString, tpDefault);
             eventDate.draw(canvas);
-            canvas.translate(0, 13);
+            canvas.translate(0, 20);
 
             StaticLayout place = createStaticLayout("Local: " + ticket.getEventPlace(), tpDefault);
             place.draw(canvas);
-            canvas.translate(0, 13);
+            canvas.translate(0, 20);
 
             String cityAndState = "Cidade: " + ticket.getEventCity() + "/" + ticket.getEventUF();
             StaticLayout city = createStaticLayout(cityAndState, tpDefault);
             city.draw(canvas);
-            canvas.translate(0, 13);
+            canvas.translate(0, 20);
 
             StaticLayout payment = createStaticLayout("Pagamento: " + toPosPaymentType(ticket.getPaymentType()), tpDefault);
             payment.draw(canvas);
@@ -105,10 +106,11 @@ public class CreateTicket {
 
             StaticLayout sequence = createStaticLayout( ticket.getSequence() + "/" + amounttickets, tpDefault);
             sequence.draw(canvas);
-            canvas.translate(0, 30);
+            canvas.translate(0, 60);
 
             StaticLayout cutHere = createStaticLayout( "- - - - - - - - - - - - - RECORTE AQUI - - - - - - - - - - - - - ", tpDefault);
             cutHere.draw(canvas);
+            canvas.translate(0, 30);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);

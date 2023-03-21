@@ -8,7 +8,7 @@ import androidmads.library.qrgenearator.QRGEncoder;
 
 public class QrCode {
     public Bitmap create(String content) {
-        QRGEncoder qrgEncoder = new QRGEncoder(content, null, QRGContents.Type.TEXT, 200);
+        QRGEncoder qrgEncoder = new QRGEncoder(content, null, QRGContents.Type.TEXT, 300);
         qrgEncoder.setColorBlack(Color.TRANSPARENT);
         qrgEncoder.setColorWhite(Color.BLACK);
         Bitmap bitmap = qrgEncoder.getBitmap();

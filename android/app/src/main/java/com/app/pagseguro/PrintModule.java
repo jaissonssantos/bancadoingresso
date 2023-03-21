@@ -144,6 +144,7 @@ public class PrintModule extends ReactContextBaseJavaModule {
 
     private void printOnPos(String imagePath, Integer sequence) {
         PlugPagPrinterData data = new PlugPagPrinterData(imagePath, 4,10 * 12);
+
         PlugPagPrinterListener listener = new PlugPagPrinterListener() {
             @Override
             public void onSuccess(@NonNull PlugPagPrintResult plugPagPrintResult) {
@@ -157,9 +158,16 @@ public class PrintModule extends ReactContextBaseJavaModule {
                 Log.i(TAG, "Print success: " + plugPagPrintResult.getMessage());
             }
         };
-        PlugPagPrintResult result = mPlugPag.printFromFile(data);
-        if (result.getResult() == PlugPag.RET_OK) {
 
+        mPlugPag.setPrinterListener(listener);
+        PlugPagPrintResult result = mPlugPag.printFromFile(data);
+
+        if (result.getResult() == PlugPag.RET_OK) {
+            sendEvent("eventSuccessPrint", createObjectToEventSuccessPrint(result, sequence));
+            Log.i(TAG, "Print success: " + result.getMessage());
+        } else {
+            sendEvent("eventErrorPrint", createObjectToEventSuccessPrint(result, sequence));
+            Log.i(TAG, "Print success: " +  result.getMessage());
         }
     }
 
