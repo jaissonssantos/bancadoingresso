@@ -19,14 +19,21 @@ import {
   startPayment,
   abortPayment,
 } from 'src/core/native_modules/payment';
-import { useSnackbar } from 'src/hooks/useSnackbar';
-import { PAYMENT_TYPES, OrderPayment } from 'src/features/cart/types';
+import { startPrint } from 'src/core/native_modules/print';
+// import { useSnackbar } from 'src/hooks/useSnackbar';
+import {
+  PAYMENT_TYPES,
+  OrderPayment,
+  PrintTicket,
+} from 'src/features/cart/types';
 import { ROUTES } from 'src/navigation/constants/routes';
-import { toString } from 'src/util/currency';
 import { calculateFees } from 'src/util/helpers';
 import { feeToNumber } from 'src/util/formatters';
 import { saveOrder } from 'src/features/cart/services';
-import { formatPaymentPayload } from 'src/features/cart/utils';
+import {
+  formatPaymentPayload,
+  formatPrintTicket,
+} from 'src/features/cart/utils';
 import { getErrorMessage } from 'src/services/request/errors';
 import {
   States,
@@ -34,8 +41,9 @@ import {
   PaymentByCreditCardEventListener,
   PinCodePinRequestedEventListener,
   AbortPaymentEventListener,
-  PrintSuccessEventListener,
-  PrintErrorEventListener,
+  // PrintSuccessEventListener,
+  // PrintErrorEventListener,
+  EventPrintListener,
 } from './ui';
 
 type PaymentByCreditCardScreenProps =
@@ -47,8 +55,8 @@ export const PaymentByCreditCardScreen: React.FC<
   const installmentFromNavigation = route.params.installment;
   // const uuid = route.params.uuid ?? null;
 
-  const snackbar = useSnackbar();
   const dispatch = useDispatch();
+  // const snackbar = useSnackbar();
   const cart = useSelector(useCart);
   const splitPayments = useSelector(usePayments);
   const { maximumFee } = useSelector(useFees);
@@ -60,15 +68,6 @@ export const PaymentByCreditCardScreen: React.FC<
     feeToNumber(maximumFee?.administrateTax),
   );
 
-  console.log('cart items >>> ', JSON.stringify(cart.items));
-  console.log('splitPayments items >>> ', splitPayments.items);
-
-  console.log(
-    'splitPayments total amount >>> ',
-    toString(splitPayments.totalAmount / 100),
-  );
-  console.log('cart total amount >>> ', toString(totalAmountFee));
-
   const [state, setState] = useState(States.awaiting_credit_card);
   const [statusPayment, setStatusPayment] = useState<string | null>(
     'AGUARDE...',
@@ -78,6 +77,7 @@ export const PaymentByCreditCardScreen: React.FC<
   const [ordersPayment, setOrdersPayment] = useState<OrderPayment[]>([]);
   const [errorOrderSave, setErrorOrderSave] = useState<string | null>(null);
   const [codePin, setCodePin] = useState<string | null>(null);
+  const [printTickets, setPrintTickets] = useState<PrintTicket[]>([]);
   const eventEmitter = new NativeEventEmitter(PaymentModule);
 
   const handleOnSubmitOrder = async (orders: OrderPayment[]): Promise<void> => {
@@ -96,7 +96,10 @@ export const PaymentByCreditCardScreen: React.FC<
           installmentFromNavigation.value * 100,
         ),
       );
-      setState(States.finished);
+
+      const tickets = formatPrintTicket(cart, orders);
+      setPrintTickets(tickets);
+      await startPrint(tickets, 1);
     } catch (error) {
       setErrorOrderSave(getErrorMessage(error));
       setState(States.order_save_error);
@@ -119,6 +122,7 @@ export const PaymentByCreditCardScreen: React.FC<
     setErrorPayment(null);
     setCodePin(null);
     setErrorOrderSave(null);
+    setPrintTickets([]);
 
     handleOnStartPayment();
   };
@@ -252,25 +256,25 @@ export const PaymentByCreditCardScreen: React.FC<
       },
     );
 
-    const eventCodePrintSuccessListener = eventEmitter.addListener(
-      'eventPrintSuccess',
-      ({ message }: PrintSuccessEventListener): void => {
-        snackbar.show({
-          message: message!,
-          type: 'success',
-        });
-      },
-    );
+    // const eventCodePrintSuccessListener = eventEmitter.addListener(
+    //   'eventPrintSuccess',
+    //   ({ message }: PrintSuccessEventListener): void => {
+    //     snackbar.show({
+    //       message: message!,
+    //       type: 'success',
+    //     });
+    //   },
+    // );
 
-    const eventCodePrintErrorListener = eventEmitter.addListener(
-      'eventPrintError',
-      ({ message }: PrintErrorEventListener): void => {
-        snackbar.show({
-          message: message!,
-          type: 'danger',
-        });
-      },
-    );
+    // const eventCodePrintErrorListener = eventEmitter.addListener(
+    //   'eventPrintError',
+    //   ({ message }: PrintErrorEventListener): void => {
+    //     snackbar.show({
+    //       message: message!,
+    //       type: 'danger',
+    //     });
+    //   },
+    // );
 
     return (): void => {
       eventEmitter.removeAllListeners('eventStatusPayment');
@@ -279,18 +283,49 @@ export const PaymentByCreditCardScreen: React.FC<
       eventEmitter.removeAllListeners('eventPasswordToPayment');
       eventEmitter.removeAllListeners('eventCodePinRequested');
       eventEmitter.removeAllListeners('eventCodeAvailableAbort');
-      eventEmitter.removeAllListeners('eventPrintSuccess');
-      eventEmitter.removeAllListeners('eventPrintError');
+      // eventEmitter.removeAllListeners('eventPrintSuccess');
+      // eventEmitter.removeAllListeners('eventPrintError');
       eventPaymentStatusListener.remove();
       eventPaymentSuccessListener.remove();
       eventPaymentErrorListener.remove();
       eventPasswordToListener.remove();
       eventCodePinRequestedListener.remove();
       eventCodeAvailableListener.remove();
-      eventCodePrintSuccessListener.remove();
-      eventCodePrintErrorListener.remove();
+      // eventCodePrintSuccessListener.remove();
+      // eventCodePrintErrorListener.remove();
     };
   }, []);
+
+  useEffect(() => {
+    const eventSuccessPrintListener = eventEmitter.addListener(
+      'eventSuccessPrint',
+      async (eventPrintListener: EventPrintListener): Promise<void> => {
+        log.i(`Success do print: ${JSON.stringify(eventPrintListener)}`);
+        log.i(`printTickets: ${printTickets.length}`);
+
+        if (eventPrintListener.sequence === printTickets.length) {
+          setState(States.finished);
+        }
+      },
+    );
+
+    const eventErrorPrintListener = eventEmitter.addListener(
+      'eventErrorPrint',
+      async (eventPrintListener: EventPrintListener): Promise<void> => {
+        log.e(`Error do print: ${JSON.stringify(eventPrintListener)}`);
+        log.e(`printTickets: ${JSON.stringify(printTickets.length)}`);
+
+        await startPrint(printTickets, eventPrintListener.steps);
+      },
+    );
+
+    return (): void => {
+      eventEmitter.removeAllListeners('eventSuccessPrint');
+      eventEmitter.removeAllListeners('eventErrorPrint');
+      eventSuccessPrintListener.remove();
+      eventErrorPrintListener.remove();
+    };
+  }, [printTickets]);
 
   useBackHandler(() => {
     if (isAvailableAbort) {

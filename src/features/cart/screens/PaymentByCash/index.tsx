@@ -36,11 +36,14 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
   navigation,
   route,
 }) => {
+  const amount = route.params.amount || 0;
+  const dispatch = useDispatch();
+
   const [visible, setVisible] = useState(false);
   const [state, setState] = useState(States.loading);
   const [order, setOrder] = useState<Order>();
   const [printTickets, setPrintTickets] = useState<PrintTicket[]>([]);
-  const dispatch = useDispatch();
+
   const cart = useSelector(useCart);
   const { maximumFee } = useSelector(useFees);
   const { terminalSerialNumber } = useSelector(usePinpad);
@@ -48,23 +51,15 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
 
   const eventEmitter = new NativeEventEmitter(PrintModule);
 
-  const amount = route.params.amount || 0;
-
   const totalAmountFee = calculateFees(
     feeToNumber(cart.totalAmount),
     feeToNumber(maximumFee?.administrateTax),
   );
 
-  const sendToPrint = async (
-    tickets: PrintTicket[],
-    ticketSequence: number,
-  ): Promise<void> => {
-    await startPrint(tickets, ticketSequence);
-  };
-
   const handleOnPaymentFinish = async (): Promise<void> => {
     try {
       setVisible(true);
+
       const orders: OrderPayment[] = [
         {
           paymentType: 0,
@@ -72,25 +67,22 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
         },
       ];
 
-      const formatedPayload = formatPaymentPayload(
+      const formatPayload = formatPaymentPayload(
         terminalSerialNumber,
         cart,
         orders,
         totalAmountFee,
         totalAmountFee,
       );
-      console.log('payload >>> ', JSON.stringify(formatedPayload));
-      setOrder(formatedPayload);
 
-      const formatedPrintTicket = formatPrintTicket(cart, orders);
-      console.log('formatedPrintTicket >>> ', formatedPrintTicket);
+      const formattedPrintTicket = formatPrintTicket(cart, orders);
 
-      setPrintTickets(formatedPrintTicket);
-
-      await sendToPrint(formatedPrintTicket, 1);
+      setOrder(formatPayload);
+      setPrintTickets(formattedPrintTicket);
+      await startPrint(formattedPrintTicket, 1);
     } catch (error) {
       setState(States.error);
-      console.log(error);
+      log.e(`Error start payment: ${JSON.stringify(error)}`);
     }
   };
 
@@ -120,7 +112,7 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
         log.i(`Success do print: ${JSON.stringify(eventPrintListener)}`);
         log.i(`printTickets: ${printTickets.length}`);
 
-        if (eventPrintListener.sequence === printTickets?.length!) {
+        if (eventPrintListener.sequence === printTickets.length) {
           await saveOrder(token, order as Order);
           setState(States.success);
         }
@@ -130,11 +122,10 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
     const eventErrorPrintListener = eventEmitter.addListener(
       'eventErrorPrint',
       async (eventPrintListener: EventPrintListener): Promise<void> => {
-        log.e(
-          `Error do print: ${eventPrintListener.result} | ${eventPrintListener.message}`,
-        );
+        log.e(`Error do print: ${JSON.stringify(eventPrintListener)}`);
         log.e(`printTickets: ${JSON.stringify(printTickets.length)}`);
-        await sendToPrint(
+
+        await startPrint(
           printTickets as PrintTicket[],
           eventPrintListener.steps,
         );
@@ -160,7 +151,7 @@ export const PaymentByCashScreen: React.FC<PaymentByCashScreenProps> = ({
       state={state}
       visible={visible}
       onPaymentFinish={handleOnPaymentFinish}
-      onClose={handleOnClose}
+      // onClose={handleOnClose}
       onDismiss={(): void => setVisible(!visible)}
       onRetry={handleOnPaymentFinish}
     />

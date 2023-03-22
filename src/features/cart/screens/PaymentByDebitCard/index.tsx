@@ -9,9 +9,14 @@ import {
   startPayment,
   abortPayment,
 } from 'src/core/native_modules/payment';
+import { startPrint } from 'src/core/native_modules/print';
 import { log } from 'src/util/log';
-import { useSnackbar } from 'src/hooks/useSnackbar';
-import { OrderPayment, PAYMENT_TYPES } from 'src/features/cart/types';
+// import { useSnackbar } from 'src/hooks/useSnackbar';
+import {
+  OrderPayment,
+  PAYMENT_TYPES,
+  PrintTicket,
+} from 'src/features/cart/types';
 import { ROUTES } from 'src/navigation/constants/routes';
 import { usePinpad } from 'src/redux/pinpadSlice';
 import { useFees } from 'src/redux/feesSlice';
@@ -21,15 +26,16 @@ import { getErrorMessage } from 'src/services/request/errors';
 import { calculateFees } from 'src/util/helpers';
 import { feeToNumber } from 'src/util/formatters';
 import { saveOrder } from '../../services';
-import { formatPaymentPayload } from '../../utils';
+import { formatPaymentPayload, formatPrintTicket } from '../../utils';
 import {
   PaymentByDebitCardUI,
   States,
   PaymentByDebitCardEventListener,
   AbortPaymentEventListener,
   PinCodePinRequestedEventListener,
-  PrintSuccessEventListener,
-  PrintErrorEventListener,
+  // PrintSuccessEventListener,
+  // PrintErrorEventListener,
+  EventPrintListener,
 } from './ui';
 
 type PaymentByDebitCardScreenProps =
@@ -41,7 +47,7 @@ export const PaymentByDebitCardScreen: React.FC<
   const amountFromNavigation = route.params.amount;
   console.log('amountFromNavigation', amountFromNavigation / 100);
 
-  const snackbar = useSnackbar();
+  // const snackbar = useSnackbar();
   const dispatch = useDispatch();
   const cart = useSelector(useCart);
   const splitPayments = useSelector(usePayments);
@@ -58,6 +64,7 @@ export const PaymentByDebitCardScreen: React.FC<
   const [ordersPayment, setOrdersPayment] = useState<OrderPayment[]>([]);
   const [errorOrderSave, setErrorOrderSave] = useState<string | null>(null);
   const [codePin, setCodePin] = useState<string | null>(null);
+  const [printTickets, setPrintTickets] = useState<PrintTicket[]>([]);
   const eventEmitter = new NativeEventEmitter(PaymentModule);
 
   const totalAmountFee = calculateFees(
@@ -81,7 +88,10 @@ export const PaymentByDebitCardScreen: React.FC<
           amountFromNavigation,
         ),
       );
-      setState(States.finished);
+
+      const tickets = formatPrintTicket(cart, orders);
+      setPrintTickets(tickets);
+      await startPrint(tickets, 1);
     } catch (error) {
       setErrorOrderSave(getErrorMessage(error));
       setState(States.order_save_error);
@@ -104,6 +114,7 @@ export const PaymentByDebitCardScreen: React.FC<
     setErrorPayment(null);
     setCodePin(null);
     setErrorOrderSave(null);
+    setPrintTickets([]);
 
     handleOnStartPayment();
   };
@@ -221,25 +232,25 @@ export const PaymentByDebitCardScreen: React.FC<
       },
     );
 
-    const eventCodePrintSuccessListener = eventEmitter.addListener(
-      'eventPrintSuccess',
-      ({ message }: PrintSuccessEventListener): void => {
-        snackbar.show({
-          message: message!,
-          type: 'success',
-        });
-      },
-    );
+    // const eventCodePrintSuccessListener = eventEmitter.addListener(
+    //   'eventPrintSuccess',
+    //   ({ message }: PrintSuccessEventListener): void => {
+    //     snackbar.show({
+    //       message: message!,
+    //       type: 'success',
+    //     });
+    //   },
+    // );
 
-    const eventCodePrintErrorListener = eventEmitter.addListener(
-      'eventPrintError',
-      ({ message }: PrintErrorEventListener): void => {
-        snackbar.show({
-          message: message!,
-          type: 'danger',
-        });
-      },
-    );
+    // const eventCodePrintErrorListener = eventEmitter.addListener(
+    //   'eventPrintError',
+    //   ({ message }: PrintErrorEventListener): void => {
+    //     snackbar.show({
+    //       message: message!,
+    //       type: 'danger',
+    //     });
+    //   },
+    // );
 
     return (): void => {
       eventEmitter.removeAllListeners('eventStatusPayment');
@@ -248,18 +259,49 @@ export const PaymentByDebitCardScreen: React.FC<
       eventEmitter.removeAllListeners('eventPasswordToPayment');
       eventEmitter.removeAllListeners('eventCodePinRequested');
       eventEmitter.removeAllListeners('eventCodeAvailableAbort');
-      eventEmitter.removeAllListeners('eventPrintSuccess');
-      eventEmitter.removeAllListeners('eventPrintError');
+      // eventEmitter.removeAllListeners('eventPrintSuccess');
+      // eventEmitter.removeAllListeners('eventPrintError');
       eventPaymentStatusListener.remove();
       eventPaymentSuccessListener.remove();
       eventPaymentErrorListener.remove();
       eventPasswordToListener.remove();
       eventCodePinRequestedListener.remove();
       eventCodeAvailableListener.remove();
-      eventCodePrintSuccessListener.remove();
-      eventCodePrintErrorListener.remove();
+      // eventCodePrintSuccessListener.remove();
+      // eventCodePrintErrorListener.remove();
     };
   }, []);
+
+  useEffect(() => {
+    const eventSuccessPrintListener = eventEmitter.addListener(
+      'eventSuccessPrint',
+      async (eventPrintListener: EventPrintListener): Promise<void> => {
+        log.i(`Success do print: ${JSON.stringify(eventPrintListener)}`);
+        log.i(`printTickets: ${printTickets.length}`);
+
+        if (eventPrintListener.sequence === printTickets.length) {
+          setState(States.finished);
+        }
+      },
+    );
+
+    const eventErrorPrintListener = eventEmitter.addListener(
+      'eventErrorPrint',
+      async (eventPrintListener: EventPrintListener): Promise<void> => {
+        log.e(`Error do print: ${JSON.stringify(eventPrintListener)}`);
+        log.e(`printTickets: ${JSON.stringify(printTickets.length)}`);
+
+        await startPrint(printTickets, eventPrintListener.steps);
+      },
+    );
+
+    return (): void => {
+      eventEmitter.removeAllListeners('eventSuccessPrint');
+      eventEmitter.removeAllListeners('eventErrorPrint');
+      eventSuccessPrintListener.remove();
+      eventErrorPrintListener.remove();
+    };
+  }, [printTickets]);
 
   useBackHandler(() => {
     if (isAvailableAbort) {

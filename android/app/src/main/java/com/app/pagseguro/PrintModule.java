@@ -155,7 +155,7 @@ public class PrintModule extends ReactContextBaseJavaModule {
             @Override
             public void onError(@NotNull PlugPagPrintResult plugPagPrintResult) {
                 sendEvent("eventErrorPrint", createObjectToEventSuccessPrint(plugPagPrintResult, sequence));
-                Log.i(TAG, "Print success: " + plugPagPrintResult.getMessage());
+                Log.i(TAG, "Print error: " + plugPagPrintResult.getMessage());
             }
         };
 
@@ -167,7 +167,7 @@ public class PrintModule extends ReactContextBaseJavaModule {
             Log.i(TAG, "Print success: " + result.getMessage());
         } else {
             sendEvent("eventErrorPrint", createObjectToEventSuccessPrint(result, sequence));
-            Log.i(TAG, "Print success: " +  result.getMessage());
+            Log.i(TAG, "Print error: " +  result.getMessage());
         }
     }
 

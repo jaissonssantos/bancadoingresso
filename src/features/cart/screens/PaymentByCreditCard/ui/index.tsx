@@ -42,6 +42,14 @@ export interface PrintSuccessEventListener
 export interface PrintErrorEventListener
   extends PaymentByCreditCardEventListener {}
 
+export interface EventPrintListener {
+  errorCode: string;
+  message: string;
+  result: number;
+  steps: number;
+  sequence: number;
+}
+
 interface PaymentByCreditCardUIProps {
   state: States;
   totalAmountFromSplitPayment: number;

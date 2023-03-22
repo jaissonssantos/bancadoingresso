@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, TextAligns, TextSizes, TextWeights } from 'src/components/Text';
 import { Button } from 'src/components/Button';
 import { Dialog } from 'src/components/Dialog';
-import { BottomSheetReceipt } from 'src/components/BottomSheetReceipt';
+// import { BottomSheetReceipt } from 'src/components/BottomSheetReceipt';
 import { SuccessIcon, ErrorIcon, IconSizes } from 'src/assets/icons';
 import { toString } from 'src/util/currency';
 import { Colors } from 'src/styleguide/colors';
@@ -23,7 +23,7 @@ interface PaymentByCashUIProps {
   state: States;
   visible: boolean;
   onPaymentFinish: () => void;
-  onClose: () => void;
+  // onClose: () => void;
   onDismiss: () => void;
   onRetry: () => void;
 }
@@ -34,7 +34,7 @@ export const PaymentByCashUI: React.FC<PaymentByCashUIProps> = ({
   visible,
   state,
   onPaymentFinish,
-  onClose,
+  // onClose,
   onDismiss,
   onRetry,
 }) => {
@@ -152,12 +152,12 @@ export const PaymentByCashUI: React.FC<PaymentByCashUIProps> = ({
         }
       />
 
-      <BottomSheetReceipt
+      {/* <BottomSheetReceipt
         title="Ingresso e Via do cliente"
         subtitle="Escolha por onde deseja enviar o ingresso e via do cliente ou imprima"
         visible={state === States.finished}
         onDismiss={onClose}
-      />
+      /> */}
     </React.Fragment>
   );
 };
