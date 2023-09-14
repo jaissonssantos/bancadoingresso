@@ -7,7 +7,6 @@ import type { CompositeScreenProps } from '@react-navigation/native';
 import { HomeScreen, SectorScreen } from 'src/features/events';
 import type { IEvent, ISections } from 'src/model/eventDTO';
 import { Colors } from 'src/styleguide/colors';
-import type { CartStackScreenProps } from '../CartStack';
 import type { MainTabScreenProps } from '../MainTabNavigator';
 import { Header } from '../components/Header';
 import { ROUTES } from '../constants/routes';

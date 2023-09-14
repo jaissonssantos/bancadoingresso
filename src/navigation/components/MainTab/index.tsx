@@ -54,13 +54,13 @@ export const MainTab: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
         Icon={NoteIcon}
         active={isRouteActive(ROUTES.MainTab.ScheduleHome)}
         onPress={onNavigateToRoute(ROUTES.MainTab.ScheduleHome)}
-      />
+      /> */}
       <MainTabItem
         label="Admin"
         Icon={GearIcon}
-        active={isRouteActive(ROUTES.MainTab.ScheduleHome)}
-        onPress={onNavigateToRoute(ROUTES.MainTab.ScheduleHome)}
-      /> */}
+        active={isRouteActive(ROUTES.MainTab.AdminHome)}
+        onPress={onNavigateToRoute(ROUTES.MainTab.AdminHome)}
+      />
     </View>
   );
 };

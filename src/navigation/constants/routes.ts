@@ -9,6 +9,7 @@ export const ROUTES = {
     Cart: 'MainTab.Cart',
     ProductsHome: 'MainTab.Products',
     ScheduleHome: 'MainTab.ScheduleHome',
+    AdminHome: 'MainTab.AdminHome',
   },
   EventsTabHome: {
     itself: 'EventsTabHome.itself',
@@ -30,5 +31,8 @@ export const ROUTES = {
     PaymentChoiceByInstallment: 'Payments.PaymentChoiceByInstallment',
     PaymentByCreditCard: 'Payments.PaymentByCreditCard',
     PaymentByDebitCard: 'Payments.PaymentByDebitCard',
+  },
+  AdminTabHome: {
+    Home: 'AdminTabHome.Home',
   },
 } as const;

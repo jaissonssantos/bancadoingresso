@@ -8,6 +8,7 @@ import { ROUTES } from '../constants/routes';
 import { EventStack } from '../EventStack';
 import { ProductsStack } from '../ProductStack';
 import { CartStack } from '../CartStack';
+import { AdminStack } from '../AdminStack';
 import type { RootStackScreenProps } from '../RootStack';
 
 const { MainTab: MAIN_TAB_ROUTES } = ROUTES;
@@ -17,6 +18,7 @@ export type MainTabParamList = {
   [MAIN_TAB_ROUTES.Cart]: undefined;
   [MAIN_TAB_ROUTES.ProductsHome]: undefined;
   [MAIN_TAB_ROUTES.ScheduleHome]: undefined;
+  [MAIN_TAB_ROUTES.AdminHome]: undefined;
 };
 
 export type MainTabScreenProps<T extends keyof MainTabParamList> =
@@ -38,9 +40,10 @@ export const MainTabNavigator: React.FC<
     <Tab.Screen name={MAIN_TAB_ROUTES.Home} component={EventStack} />
     <Tab.Screen name={MAIN_TAB_ROUTES.Cart} component={CartStack} />
     <Tab.Screen name={MAIN_TAB_ROUTES.ProductsHome} component={ProductsStack} />
-    <Tab.Screen
+    {/* <Tab.Screen
       name={MAIN_TAB_ROUTES.ScheduleHome}
       component={ScheduleHomeScreen}
-    />
+    /> */}
+    <Tab.Screen name={MAIN_TAB_ROUTES.AdminHome} component={AdminStack} />
   </Tab.Navigator>
 );
